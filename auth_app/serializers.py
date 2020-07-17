@@ -1,22 +1,28 @@
 from rest_framework import serializers
 from .models import Login, ErrorMessage, LoginPayload, LoginResponse
 
-class LoginSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = LoginPayload
-        fields = ['email', 'password']
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField(max_length=100, required=True)
+    password = serializers.CharField(max_length=100, required=True)
+    def create(self, validated_data):
+        return LoginPayload(**validated_data)
 
 class RegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Login
         fields = ['name', 'email', 'role' , 'image', 'password']
 
-class ErrorMessageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ErrorMessage
-        fields = ['code', 'message']
+class ErrorMessageSerializer(serializers.Serializer):
+    code = serializers.CharField(max_length=80)
+    message =  serializers.CharField(max_length=80)
+    def create(self, validated_data):
+        return ErrorMessage(**validated_data)
+    
 
-class LoginResponseSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = LoginResponse
-        fields = ['accessToken', 'refreshToken']
+class LoginResponseSerializer(serializers.Serializer):
+    accessToken  = serializers.CharField(max_length=1000)
+    refreshToken = serializers.CharField(max_length=1000)
+    
+    def create(self, validated_data):
+        return LoginResponse(**validated_data)
+    

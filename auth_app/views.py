@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from django.http import HttpResponse, JsonResponse
 from rest_framework.parsers import JSONParser
 from rest_framework.views import APIView
-from .models import Login,ErrorMessage, LoginPayload, LoginResponse
+from .models import Login
 from .serializers import LoginSerializer, RegistrationSerializer, ErrorMessageSerializer, LoginResponseSerializer
 import uuid
 from passlib.context import CryptContext
@@ -26,9 +26,10 @@ class LoginView(APIView):
         if serializer.is_valid():
             user = Login.objects.get(email__exact = serializer.data['email'])
             try :
-                print(pwd_context.verify (serializer.data['password'], user.password))
-                accessToken = jwt.encode({'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=30),'email':user.email, 'role':user.role}, 'secret')
-                return Response(dict(accessToken=accessToken), status= status.HTTP_201_CREATED)
+                if pwd_context.verify (serializer.data['password'], user.password):
+                    accessToken = jwt.encode({'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=30),'email':user.email, 'role':user.role}, 'secret')
+                    return Response(dict(accessToken=accessToken), status= status.HTTP_201_CREATED)
+                return Response( dict(code="Failed", message ="Invalid User Name or Password"), status = status.HTTP_401_UNAUTHORIZED)
             except:
                 return Response( dict(code="Failed", message ="Invalid User Name or Password"), status = status.HTTP_401_UNAUTHORIZED)
 
