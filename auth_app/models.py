@@ -21,20 +21,14 @@ class Login(models.Model):
     def __str__(self):
         return self.name
 
-class ErrorMessage(models.Model):
+class ErrorMessage():
     code = models.CharField(max_length=80)
     message =  models.CharField(max_length=80)
 
-    def __str__(self):
-        return self.code
-
-class LoginPayload(models.Model):
+class LoginPayload():
     email = models.EmailField(max_length=100,blank=False)
     password = models.CharField(max_length=100, blank=False)
-    
-    def __str__(self):
-        return self.email
 
-class LoginResponse(models.Model):
+class LoginResponse():
     accessToken  = models.CharField(max_length=1000)
     refreshToken = models.CharField(max_length=1000)
