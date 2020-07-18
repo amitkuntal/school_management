@@ -82,10 +82,10 @@ DATABASES = {
     # }
     'default':{
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'atlantisdb',
-        'USER': 'lfuser',
-        'PASSWORD': 'lfpass',
-        'HOST': 'localhost',
+        'NAME': 'deqgig8boels3v',
+        'USER': 'hdrugghytglrgx',
+        'PASSWORD': '0cc51a017607716cb3b64c1fec0d9a957d823332659d5818f3888ca6fc86f913',
+        'HOST': 'ec2-52-202-66-191.compute-1.amazonaws.com',
         'PORT': '' 
     }
 }
