@@ -1,1 +1,1 @@
-web: waitress-serve --listen=*:8000 school_management.wsgi:application
+web: gunicorn school_management.wsgi
