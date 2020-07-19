@@ -1,1 +1,1 @@
-web: gunicorn school_management:app
+web: python manage.py runserver
