@@ -11,7 +11,7 @@ import uuid
 from passlib.context import CryptContext
 import jwt
 import datetime
-from .util import roleChecker, roleTimer
+from school_management.util import roleChecker, roleTimer
 
 
 pwd_context = CryptContext(
@@ -82,30 +82,30 @@ class RegisterView(APIView):
     def delete(self, request):
         return Response(status=status.HTTP_404_NOT_FOUND) 
 
-class ProfileView(APIView):
-    def put(self, request):
-            try:
-                authToken = request.headers["auth"]
-                payload  = jwt.decode(authToken,"secret")
-                role = payload['role']
-                serializer  = ProfileSerializer(data = request.data) 
-                 if serializer.is_valid():
-                     user = Register.objects.get(email__exact = serializer.data['email'])
-            try :
-                if pwd_context.verify (serializer.data['password'], user.password):
-                    accessToken = jwt.encode({'exp':roleTimer(user.role),'email':user.email, 'role':user.role}, 'secret')
-                    return Response(dict(accessToken=accessToken), status= status.HTTP_201_CREATED)
-                return Response( dict(code="Failed", message ="Invalid User Name or Password"), status = status.HTTP_401_UNAUTHORIZED)
-            except:
-                return Response( dict(code="Failed", message ="Invalid User Name or Password"), status = status.HTTP_401_UNAUTHORIZED)
+# class ProfileView(APIView):
+#     def put(self, request):
+#             try:
+#                 authToken = request.headers["auth"]
+#                 payload  = jwt.decode(authToken,"secret")
+#                 role = payload['role']
+#                 serializer  = ProfileSerializer(data = request.data) 
+#                  if serializer.is_valid():
+#                      user = Register.objects.get(email__exact = serializer.data['email'])
+#             try :
+#                 if pwd_context.verify (serializer.data['password'], user.password):
+#                     accessToken = jwt.encode({'exp':roleTimer(user.role),'email':user.email, 'role':user.role}, 'secret')
+#                     return Response(dict(accessToken=accessToken), status= status.HTTP_201_CREATED)
+#                 return Response( dict(code="Failed", message ="Invalid User Name or Password"), status = status.HTTP_401_UNAUTHORIZED)
+#             except:
+#                 return Response( dict(code="Failed", message ="Invalid User Name or Password"), status = status.HTTP_401_UNAUTHORIZED)
 
-        return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)
+#         return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)
 
-    def get(self, request):
-        return Response(status=status.HTTP_404_NOT_FOUND)
+#     def get(self, request):
+#         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    def put(self, request):
-        return Response(status=status.HTTP_404_NOT_FOUND)
+#     def put(self, request):
+#         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    def delete(self, request):
-        return Response(status=status.HTTP_404_NOT_FOUND)
+#     def delete(self, request):
+#         return Response(status=status.HTTP_404_NOT_FOUND)
