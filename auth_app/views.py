@@ -11,6 +11,7 @@ import uuid
 from passlib.context import CryptContext
 import jwt
 import datetime
+from .util import roleChecker, roleTimer
 
 
 pwd_context = CryptContext(
@@ -27,7 +28,7 @@ class LoginView(APIView):
             user = Login.objects.get(email__exact = serializer.data['email'])
             try :
                 if pwd_context.verify (serializer.data['password'], user.password):
-                    accessToken = jwt.encode({'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=30),'email':user.email, 'role':user.role}, 'secret')
+                    accessToken = jwt.encode({'exp':roleTimer(user.role),'email':user.email, 'role':user.role}, 'secret')
                     return Response(dict(accessToken=accessToken), status= status.HTTP_201_CREATED)
                 return Response( dict(code="Failed", message ="Invalid User Name or Password"), status = status.HTTP_401_UNAUTHORIZED)
             except:
@@ -47,30 +48,64 @@ class LoginView(APIView):
 
 
 # Create your views here.
+class RegisterView(APIView):
+    def post(self, request):
+            try:
+                authToken = request.headers["auth"]
+                payload  = jwt.decode(authToken,"secret")
+                role = payload['role']
+                serializer  = RegistrationSerializer(data = request.data)
+                if serializer.is_valid():
+                    if(roleChecker(role,request.data['role'])):
+                        loginSerializer = Login(
+                                        name = request.data['name'],
+                                        email =  request.data['email'],
+                                        role = request.data['role'],
+                                        image = request.data['image'],
+                                        password = pwd_context.encrypt(request.data['password']))
+                        ProfileSerializer.save()
+                        return Response(status= status.HTTP_201_CREATED)
+                    return Response(dict(code="400", message="Unauthrized Access"), status= status.HTTP_401_UNAUTHORIZED)   
+                return Response(serializer.errors, status= status.HTTP_400_BAD_REQUEST)
+            except jwt.exceptions.ExpiredSignatureError:
+                return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)   
+            except jwt.exceptions.DecodeError:
+                 return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)   
+            except:
+               return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)   
+    def get(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
-@api_view(['POST'])
-def register(request):
-    try:
-        authToken = request.headers["auth"]
-        payload  = jwt.decode(authToken,"secret")
-        role = payload['role']
-        serializer  = RegistrationSerializer(data = request.data)
-        if serializer.is_valid():
-            loginSerializer = Login(
-                                    name = request.data['name'],
-                                    email =  request.data['email'],
-                                    role = request.data['role'],
-                                    image = request.data['image'],
-                                    password = pwd_context.encrypt(request.data['password']))
-            loginSerializer.save()
-            return Response(status= status.HTTP_201_CREATED)
-        return Response(serializer.errors, status= status.HTTP_400_BAD_REQUEST)
-    except jwt.exceptions.ExpiredSignatureError:
-        return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)   
-    except jwt.exceptions.DecodeError:
-        return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)   
-    except:
-        return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)   
-        
+    def put(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
+    def delete(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND) 
 
+class ProfileView(APIView):
+    def put(self, request):
+            try:
+                authToken = request.headers["auth"]
+                payload  = jwt.decode(authToken,"secret")
+                role = payload['role']
+                serializer  = ProfileSerializer(data = request.data) 
+                 if serializer.is_valid():
+                     user = Register.objects.get(email__exact = serializer.data['email'])
+            try :
+                if pwd_context.verify (serializer.data['password'], user.password):
+                    accessToken = jwt.encode({'exp':roleTimer(user.role),'email':user.email, 'role':user.role}, 'secret')
+                    return Response(dict(accessToken=accessToken), status= status.HTTP_201_CREATED)
+                return Response( dict(code="Failed", message ="Invalid User Name or Password"), status = status.HTTP_401_UNAUTHORIZED)
+            except:
+                return Response( dict(code="Failed", message ="Invalid User Name or Password"), status = status.HTTP_401_UNAUTHORIZED)
+
+        return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)
+
+    def get(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def put(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def delete(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)

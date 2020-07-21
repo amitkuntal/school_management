@@ -16,10 +16,10 @@ class Login(models.Model):
     email  = models.EmailField(max_length=200, unique=True)
     password =  models.CharField(max_length=200)
     role = models.CharField(max_length=200, choices=Role, default='Student')
-    active =  models.BooleanField(default=True)
+    active =  models.BooleanField(default=True) 
 
     def __str__(self):
-        return self.name
+        return self.name 
 
 class ErrorMessage():
     code = models.CharField(max_length=80)
