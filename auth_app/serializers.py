@@ -56,6 +56,11 @@ class RegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Login
         fields = ['name', 'email', 'role' , 'image', 'password']
+
+class EmployeeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Employee
+        fields = '__all__'
         
 class ErrorMessageSerializer(serializers.Serializer):
     code = serializers.CharField(max_length=80)

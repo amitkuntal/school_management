@@ -6,7 +6,7 @@ from django.http import HttpResponse, JsonResponse
 from rest_framework.parsers import JSONParser
 from rest_framework.views import APIView
 from .models import *
-from .serializers import LoginSerializer, RegistrationSerializer, ErrorMessageSerializer, LoginResponseSerializer
+from .serializers import *
 import uuid
 from passlib.context import CryptContext
 import jwt
@@ -106,16 +106,31 @@ class ProfileView(APIView):
                 payload  = jwt.decode(authToken,"secret")
                 role = payload['role']
                 user = Login.objects.get(email__exact = payload['email'])
+                request.data['userid'] = user.id
+                #If Admin Wants to update there profile picture
                 if (role == "Admin"):
                     admin = Admin(userid= user.id, mobile = request.data["mobile"])
                     admin.save()
-                    return Response(status= status.HTTP_201_CREATED)
+                #If Schools wants to update there profile picture
+                elif (role == 'School'):
+                    schoolSerializer = SchoolSerializer(data= request.data)
+                    if schoolSerializer.is_valid():
+                        schoolSerializer.save()
+                        return Response(status= status.HTTP_201_CREATED)
+                    return Response(schoolSerializer.errors, status= status.HTTP_400_BAD_REQUEST)
+                #If User role is school employee
+                elif (role in ['Accountant', 'Teacher','Reception']):
+                    employeSerializer =  EmployeeSerializer(data = request.data)
+                    if employeSerializer.is_valid():
+                        return Response(status= status.HTTP_201_CREATED)
+                    return Response(schoolSerializer.errors, status= status.HTTP_400_BAD_REQUEST)
+            #Exception Handling
             except jwt.exceptions.ExpiredSignatureError:
                 return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
             except jwt.exceptions.DecodeError:
                  return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
-            # except:
-            #     return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
+            except:
+                return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
 
     def get(self, request):
         return Response(status=status.HTTP_404_NOT_FOUND)
