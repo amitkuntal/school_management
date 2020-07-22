@@ -25,7 +25,7 @@ SECRET_KEY = '36ujt2b3o3ck=hpmo*%@9-px9y0=5cibru#1ugo713uryfqy1a'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['https://atlantisbackend.herokuapp.com/','localhost','desktop-hb30hjn']
 
 
 # Application definition
