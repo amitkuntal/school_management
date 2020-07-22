@@ -63,7 +63,7 @@ class RegisterView(APIView):
                                         role = request.data['role'],
                                         image = request.data['image'],
                                         password = pwd_context.encrypt(request.data['password']))
-                        ProfileSerializer.save()
+                        loginSerializer.save()
                         return Response(status= status.HTTP_201_CREATED)
                     return Response(dict(code="400", message="Unauthrized Access"), status= status.HTTP_401_UNAUTHORIZED)
                 return Response(serializer.errors, status= status.HTTP_400_BAD_REQUEST)
@@ -71,8 +71,9 @@ class RegisterView(APIView):
                 return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
             except jwt.exceptions.DecodeError:
                  return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
-            except:
-               return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
+            # except et:
+            #     print(et)
+            #     return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
     def get(self, request):
         return Response(status=status.HTTP_404_NOT_FOUND)
 

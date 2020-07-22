@@ -4,9 +4,12 @@ import datetime
 def roleChecker(tokenrole,userrole):
     try:
         roles={"Admin":1,"School":2,"Reception":3,"Teacher":4,"Student":5}
-        if (roles[tokenrole]<roles[userrole]):
+        if (tokenrole =='Admin' and userrole == 'Admin'):
             return True
-        return False
+        elif (roles[tokenrole]<roles[userrole]):
+            return True
+        else:
+            return False
     except:
         return False
 

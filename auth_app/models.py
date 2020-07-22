@@ -105,6 +105,10 @@ class TransferCertificate(models.Model):
     def __str__(self):
         return self.requestedby
 
+def upload_path(instance, filename):
+    ext = filename.split('.')[-1]
+    filename = '{}.{}'.format(uuid.uuid4().hex, ext)
+    return '/'.join(['profile',filename])
 
 class Login(models.Model):
     Role = (('Admin','Admin'), 
@@ -115,8 +119,8 @@ class Login(models.Model):
             ('Student','Student'))
     id = models.UUIDField(primary_key=True, default= uuid.uuid4, editable=False, max_length=200)
     name = models.CharField(max_length=80)
-    image = models.CharField(max_length=1000)
-    email  = models.EmailField(max_length=200, unique=True)
+    image = models.ImageField(blank=False, null = False, upload_to= upload_path)
+    email  = models.CharField(max_length=200, unique=True)
     password =  models.CharField(max_length=200)
     role = models.CharField(max_length=200, choices=Role, default='Student')
     active =  models.BooleanField(default=True)
