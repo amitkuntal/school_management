@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from django.http import HttpResponse, JsonResponse
 from rest_framework.parsers import JSONParser
 from rest_framework.views import APIView
-from .models import Login
+from .models import *
 from .serializers import LoginSerializer, RegistrationSerializer, ErrorMessageSerializer, LoginResponseSerializer
 import uuid
 from passlib.context import CryptContext
@@ -71,9 +71,10 @@ class RegisterView(APIView):
                 return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
             except jwt.exceptions.DecodeError:
                  return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
-            # except et:
-            #     print(et)
-            #     return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
+            except:
+                return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
+
+
     def get(self, request):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -82,6 +83,7 @@ class RegisterView(APIView):
 
     def delete(self, request):
         return Response(status=status.HTTP_404_NOT_FOUND)
+
 
 @api_view(['Post'])
 def register1(request):
@@ -97,30 +99,29 @@ def register1(request):
     except:
         return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
 
-# class ProfileView(APIView):
-#     def put(self, request):
-#             try:
-#                 authToken = request.headers["auth"]
-#                 payload  = jwt.decode(authToken,"secret")
-#                 role = payload['role']
-#                 serializer  = ProfileSerializer(data = request.data)
-#                  if serializer.is_valid():
-#                      user = Register.objects.get(email__exact = serializer.data['email'])
-#             try :
-#                 if pwd_context.verify (serializer.data['password'], user.password):
-#                     accessToken = jwt.encode({'exp':roleTimer(user.role),'email':user.email, 'role':user.role}, 'secret')
-#                     return Response(dict(accessToken=accessToken), status= status.HTTP_201_CREATED)
-#                 return Response( dict(code="Failed", message ="Invalid User Name or Password"), status = status.HTTP_401_UNAUTHORIZED)
-#             except:
-#                 return Response( dict(code="Failed", message ="Invalid User Name or Password"), status = status.HTTP_401_UNAUTHORIZED)
+class ProfileView(APIView):
+    def put(self, request):
+            try:
+                authToken = request.headers["auth"]
+                payload  = jwt.decode(authToken,"secret")
+                role = payload['role']
+                user = Login.objects.get(email__exact = payload['email'])
+                if (role == "Admin"):
+                    admin = Admin(userid= user.id, mobile = request.data["mobile"])
+                    admin.save()
+                    return Response(status= status.HTTP_201_CREATED)
+            except jwt.exceptions.ExpiredSignatureError:
+                return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
+            except jwt.exceptions.DecodeError:
+                 return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
+            # except:
+            #     return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
 
-#         return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)
+    def get(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
-#     def get(self, request):
-#         return Response(status=status.HTTP_404_NOT_FOUND)
+    def post(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
-#     def put(self, request):
-#         return Response(status=status.HTTP_404_NOT_FOUND)
-
-#     def delete(self, request):
-#         return Response(status=status.HTTP_404_NOT_FOUND)
+    def delete(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)

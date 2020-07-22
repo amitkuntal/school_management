@@ -9,7 +9,7 @@ class SchoolSerializer(serializers.ModelSerializer):
 class AdminSerializer(serializers.ModelSerializer):
     class Meta:
         model = Admin
-        fields = ['userid', 'mobile', 'address2']
+        fields = ['userid', 'mobile']
 
 class StudentSerializer(serializers.ModelSerializer):
     class Meta:

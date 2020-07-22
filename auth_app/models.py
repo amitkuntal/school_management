@@ -17,7 +17,7 @@ class School(models.Model):
 class Admin(models.Model):
     id = models.UUIDField(primary_key=True, default= uuid.uuid4, editable=False, max_length=200)
     userid = models.UUIDField(max_length=200)
-    mobile = models.IntegerField()
+    mobile = models.CharField(max_length=10)
 
 class Student(models.Model):
     id = models.UUIDField(primary_key=True, default= uuid.uuid4, editable=False, max_length=200)
