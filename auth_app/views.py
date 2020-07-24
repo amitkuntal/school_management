@@ -204,18 +204,34 @@ class ProfileView(APIView):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 
-# class GetCount(APIView):
-#     def put(self, request):
-#         return Response(status=status.HTTP_404_NOT_FOUND)
+class GetCountView(APIView):
+    def put(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
-#     def get(self, request):
-#         return Response(status=status.HTTP_404_NOT_FOUND)
+    def get(self, request, name='all'):
+        if(name.upper() == 'ALL'):
+            school = Login.objects.filter(role='School').all()
+            student = Login.objects.filter(role= 'Student').all()
+            employee = Login.objects.filter(role__in = ['Teacher','Accountant','Reception'])
+            return Response(dict(admin = len(admin),school=len(school), student = len(student), employee = len(employee)),status=status.HTTP_200_OK)
+        elif(name.upper() == 'STUDENT'):
+            student = Login.objects.filter(role= 'Student').all()
+            return Response(dict(student = len(student)), status=status.HTTP_200_OK)
+        elif(name.upper() == 'SCHOOL'):
+            school = Login.objects.filter(role='School').all()
+            return Response(dict(school = len(school)), status=status.HTTP_200_OK)
+        elif(name.upper() == 'TEACHER'):
+            student = Login.objects.filter(role= 'Teacher').all()
+            return Response(dict(student = len(student)), status=status.HTTP_200_OK)
+        elif(name.upper() == 'EMPLOYEE'):
+            employee = Login.objects.filter(role__in = ['Teacher','Accountant','Reception'])
+            return Response(dict(student = len(student)), status=status.HTTP_200_OK)
 
-#     def post(self, request):
-#         return Response(status=status.HTTP_404_NOT_FOUND)
+    def post(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
-#     def delete(self, request):
-#         return Response(status=status.HTTP_404_NOT_FOUND)
+    def delete(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 
