@@ -9,7 +9,7 @@ class School(models.Model):
     address3 =  models.CharField(max_length=100)
     city = models.CharField(max_length=50)
     state =  models.CharField(max_length=50)
-    zip = models.IntegerField()
+    zip = models.CharField(max_length=7)
 
     def __str__(self):
         return self.userid
@@ -142,7 +142,7 @@ class Employee(models.Model):
     address3 =  models.CharField(max_length=100)
     city = models.CharField(max_length=50)
     state =  models.CharField(max_length=50)
-    zip = models.IntegerField()
+    zip = models.CharField(max_length=7)
     dateOfJoining = models.DateTimeField("mm-dd-yyyy")
     salary = models.IntegerField()
 

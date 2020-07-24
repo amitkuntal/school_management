@@ -12,6 +12,8 @@ from passlib.context import CryptContext
 import jwt
 import datetime
 from school_management.util import roleChecker, roleTimer
+from django.core.files import File
+import base64
 
 
 pwd_context = CryptContext(
@@ -106,34 +108,90 @@ class ProfileView(APIView):
                 payload  = jwt.decode(authToken,"secret")
                 role = payload['role']
                 user = Login.objects.get(email__exact = payload['email'])
-                request.data['userid'] = user.id
+                userid = user.id
                 #If Admin Wants to update there profile picture
                 if (role == "Admin"):
-                    admin = Admin(userid= user.id, mobile = request.data["mobile"])
+                    admin  = Admin.objects.get_or_create(userid = userid)[0]
+                    admin.mobile = request.data["mobile"]
                     admin.save()
+                    return Response(status= status.HTTP_201_CREATED)
                 #If Schools wants to update there profile picture
                 elif (role == 'School'):
-                    schoolSerializer = SchoolSerializer(data= request.data)
-                    if schoolSerializer.is_valid():
-                        schoolSerializer.save()
-                        return Response(status= status.HTTP_201_CREATED)
-                    return Response(schoolSerializer.errors, status= status.HTTP_400_BAD_REQUEST)
+                    school = School.objects.get_or_create(userid = userid)[0]
+                    school.address1 =  request.data["address1"]
+                    school.address2 =  request.data["address2"]
+                    school.address3 =  request.data["address3"]
+                    school.city =  request.data["city"]
+                    school.state =  request.data["state"]
+                    school.zip =  request.data["zip"]
+                    school.save()
+                    return Response(status= status.HTTP_201_CREATED)
                 #If User role is school employee
                 elif (role in ['Accountant', 'Teacher','Reception']):
-                    employeSerializer =  EmployeeSerializer(data = request.data)
-                    if employeSerializer.is_valid():
-                        return Response(status= status.HTTP_201_CREATED)
-                    return Response(schoolSerializer.errors, status= status.HTTP_400_BAD_REQUEST)
+                    employee = Employee.objects.get_or_create(userid = userid)[0]
+                    employee.mobile = request.data["mobile"]
+                    employee.classid = request.data["classid"]
+                    employee.dob = request.data["dob"]
+                    employee.fathername = request.data["fathername"]
+                    employee.mothername = request.data["mothername"]
+                    employee.address1 = request.data["address1"]
+                    employee.address2 = request.data["address2"]
+                    employee.address3 = request.data["address3"]
+                    employee.city = request.data["city"]
+                    employee.state = request.data["state"]
+                    employee.zip = request.data["zip"]
+                    employee.save()
+                    return Response(status= status.HTTP_201_CREATED)
             #Exception Handling
             except jwt.exceptions.ExpiredSignatureError:
                 return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
             except jwt.exceptions.DecodeError:
                  return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
-            except:
-                return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
+            # except:
+            #     return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
 
     def get(self, request):
-        return Response(status=status.HTTP_404_NOT_FOUND)
+        try:
+            authToken = request.headers["auth"]
+            payload  = jwt.decode(authToken,"secret")
+            role = payload['role']
+            user = Login.objects.get(email__exact = payload['email'])
+            userid = user.id
+            f = open('media/'+str(user.image), 'rb')
+            image = File(f)
+            data = base64.b64encode(image.read())
+            f.close()
+            #If user role is admin then admin profile will return
+            if (role == "Admin"):
+                admin  = Admin.objects.get_or_create(userid = userid)[0]
+                response = dict(personalInfo=dict(name = user.name,email=user.email, image=data),additionalInfo=dict(mobile= admin.mobile))
+                return Response(response,status= status.HTTP_201_CREATED)
+            #If userrole is school then school profile will return
+            elif (role == 'School'):
+                school = School.objects.get_or_create(userid = userid)[0]
+                additionalInfo = dict(address1 =school.address1 ,address2 = school.address2,address3 = school.address3,city = school.city,state = school.state,zip =school.zip)
+                response = dict(personalInfo=dict(name = user.name,email=user.email, image=data),additionalInfo=additionalInfo)
+                return Response(response,status= status.HTTP_201_CREATED)
+            #If User role is Employe then Employee profile will return
+            elif (role in ['Accountant', 'Teacher','Reception']):
+                employee = Employee.objects.get_or_create(userid = userid)[0]
+                additionalInfo = dict(fathername = employee.fathername,mothername=employee.mothername,dob = employee.dob,mobile=employee.mobile,address1 =employee.address1 ,address2 = employee.address2,address3 = employee.address3,city = employee.city,state = employee.state,zip =employee.zip)
+                response = dict(personalInfo=dict(name = user.name,email=user.email, image=data),additionalInfo=additionalInfo)
+                return Response(response,status= status.HTTP_201_CREATED)
+            #If user role is student then student profile will return
+            elif (role == 'Student'):
+                student = Student.objects.get_or_create(userid = userid)
+                additionalInfo = dict(fathername = student.fathername,mothername=student.mothername,dob = student.dob,mobile=student.mobile,address1 =student.address1 ,address2 = student.address2,address3 = student.address3,city = student.city,state = student.state,zip =student.zip)
+                response = dict(personalInfo=dict(name = user.name,email=user.email, image=data),additionalInfo=additionalInfo)
+                return Response(dict(personalInfo = user, additionalinfo= student),status= status.HTTP_201_CREATED)
+        #Exception Handling
+        except jwt.exceptions.ExpiredSignatureError:
+            return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.DecodeError:
+                return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
+        # except:
+        #     return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
+    
 
     def post(self, request):
         return Response(status=status.HTTP_404_NOT_FOUND)
