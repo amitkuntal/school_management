@@ -9,5 +9,6 @@ urlpatterns = [
     path('get/count/<str:name>', GetCountView.as_view()),
     path('admin/register/student', RegisterStudentAdminView.as_view()),
     path('register/student', RegisterStudentView.as_view()),
+    path('class', RegisterClassView.as_view()),
     path('register/1/', register1)
 ]
