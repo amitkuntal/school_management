@@ -31,7 +31,11 @@ class LoginView(APIView):
             try :
                 if pwd_context.verify (serializer.data['password'], user.password):
                     accessToken = jwt.encode({'exp':roleTimer(user.role),'email':user.email, 'role':user.role}, 'secret')
-                    return Response(dict(accessToken=accessToken), status= status.HTTP_201_CREATED)
+                    f = open('media/'+str(user.image), 'rb')
+                    image = File(f)
+                    data = base64.b64encode(image.read())
+                    f.close()
+                    return Response(dict(accessToken=accessToken, name=user.name, role = user.role, image = data), status= status.HTTP_201_CREATED)
                 return Response( dict(code="Failed", message ="Invalid User Name or Password"), status = status.HTTP_401_UNAUTHORIZED)
             except:
                 return Response( dict(code="Failed", message ="Invalid User Name or Password"), status = status.HTTP_401_UNAUTHORIZED)
@@ -94,7 +98,7 @@ def register1(request):
                                     name = 'Amit',
                                     email =  'amitkuntal1998@gmal.com',
                                     role = 'Admin',
-                                    image = 'htpt:sds.jd',
+                                    image = 'media/profile/aaa.jpg',
                                     password = pwd_context.encrypt('Amit@12345'))
         loginSerializer.save()
         return Response(status= status.HTTP_201_CREATED)
@@ -198,3 +202,20 @@ class ProfileView(APIView):
 
     def delete(self, request):
         return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+# class GetCount(APIView):
+#     def put(self, request):
+#         return Response(status=status.HTTP_404_NOT_FOUND)
+
+#     def get(self, request):
+#         return Response(status=status.HTTP_404_NOT_FOUND)
+
+#     def post(self, request):
+#         return Response(status=status.HTTP_404_NOT_FOUND)
+
+#     def delete(self, request):
+#         return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+
