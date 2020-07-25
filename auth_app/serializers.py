@@ -19,7 +19,7 @@ class StudentSerializer(serializers.ModelSerializer):
 class FeeStructureSerializer(serializers.ModelSerializer):
     class Meta:
         model = FeeStructure
-        fields = ['classid', 'feename', 'cycle' , 'amount'] 
+        fields = ['classid','schoolid', 'feename', 'cycle' , 'amount'] 
 
 class AttendanceSerializer(serializers.ModelSerializer):
     class Meta:
@@ -29,7 +29,7 @@ class AttendanceSerializer(serializers.ModelSerializer):
 class ClassSerializer(serializers.ModelSerializer):
     class Meta:
         model = Class
-        fields = ['schoolid', 'classname', 'classsection']
+        fields = ['schoolid', 'classname', 'section']
 
 class FeeDepositSerializer(serializers.ModelSerializer):
     class Meta:

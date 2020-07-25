@@ -3,5 +3,6 @@ from django.urls import path, include
 
 
 urlpatterns = [
-    path('test/',TestView.as_view())
+    path('fee/structure',RegisterFeeView.as_view()),
+    path('class/fee/structure/<str:classid>',GetFeeStructureByClassid.as_view())
     ]

@@ -56,7 +56,7 @@ class Class(models.Model):
     id = models.UUIDField(primary_key=True, default= uuid.uuid4, editable=False, max_length=200)
     schoolid = models.CharField(max_length=100)
     classname = models.IntegerField()
-    section = models.CharField(max_length=2)
+    section = models.CharField(max_length=2,default="",blank=True)
     def __str__(self):
         return self.classname 
 
