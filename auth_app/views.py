@@ -91,19 +91,30 @@ class RegisterView(APIView):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 
-@api_view(['Post'])
-def register1(request):
-    try:
-        loginSerializer = Login(
-                                    name = 'Amit',
-                                    email =  'amitkuntal1998@gmal.com',
-                                    role = 'Admin',
-                                    image = 'media/profile/aaa.jpg',
-                                    password = pwd_context.encrypt('Amit@12345'))
-        loginSerializer.save()
-        return Response(status= status.HTTP_201_CREATED)
-    except:
-        return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
+class RegisterView1(APIView):
+    def post(self, request):
+        serializer  = RegistrationSerializer(data = request.data)
+        if serializer.is_valid():
+            if(roleChecker(role,request.data['role']) and request.data['role'] != 'Student'):
+                loginSerializer = Login(
+                                name = request.data['name'],
+                                email =  request.data['email'],
+                                role = request.data['role'],
+                                image = request.data['image'],
+                                password = pwd_context.encrypt(request.data['password']))
+                loginSerializer.save()
+                return Response(status= status.HTTP_201_CREATED)
+            return Response(dict(code="400", message="Unauthrized Access"), status= status.HTTP_401_UNAUTHORIZED)
+        return Response(serializer.errors, status= status.HTTP_400_BAD_REQUEST)
+
+    def get(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def put(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def delete(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 class ProfileView(APIView):
     def put(self, request):

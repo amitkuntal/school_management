@@ -8,5 +8,5 @@ urlpatterns = [
     path('profile', ProfileView.as_view()),
     path('get/count/<str:name>', GetCountView.as_view()),
     path('admin/register/student', RegisterStudentAdminView.as_view()),
-    path('register/1/', register1)
+    path('register/1', RegisterView1.as_view())
 ]
