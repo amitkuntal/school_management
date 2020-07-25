@@ -95,16 +95,14 @@ class RegisterView1(APIView):
     def post(self, request):
         serializer  = RegistrationSerializer(data = request.data)
         if serializer.is_valid():
-            if(roleChecker(role,request.data['role']) and request.data['role'] != 'Student'):
-                loginSerializer = Login(
-                                name = request.data['name'],
-                                email =  request.data['email'],
-                                role = request.data['role'],
-                                image = request.data['image'],
-                                password = pwd_context.encrypt(request.data['password']))
-                loginSerializer.save()
-                return Response(status= status.HTTP_201_CREATED)
-            return Response(dict(code="400", message="Unauthrized Access"), status= status.HTTP_401_UNAUTHORIZED)
+            loginSerializer = Login(
+                            name = request.data['name'],
+                            email =  request.data['email'],
+                            role = request.data['role'],
+                            image = request.data['image'],
+                            password = pwd_context.encrypt(request.data['password']))
+            loginSerializer.save()
+            return Response(status= status.HTTP_201_CREATED)
         return Response(serializer.errors, status= status.HTTP_400_BAD_REQUEST)
 
     def get(self, request):
