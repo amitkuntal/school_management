@@ -1,4 +1,6 @@
 import datetime
+from django.core.files import File
+import base64
 
 
 def roleChecker(tokenrole,userrole):
@@ -19,3 +21,11 @@ def roleTimer(tokenrole):
         return ( datetime.datetime.utcnow() + datetime.timedelta(hours=roles[tokenrole]))
     except:
         return ( datetime.datetime.utcnow() + datetime.timedelta(hours=100))
+
+
+def readFiles(fileName):
+    f = open('.'+str(fileName), 'rb')
+    image = File(f)
+    data = base64.b64encode(image.read())
+    f.close()
+    return data

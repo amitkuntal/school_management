@@ -57,6 +57,11 @@ class RegistrationSerializer(serializers.ModelSerializer):
         model = Login
         fields = ['name', 'email', 'role' , 'image', 'password']
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Login
+        fields = ['name', 'email', 'role' , 'image','active']
+
 class EmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee

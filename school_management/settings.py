@@ -50,7 +50,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware'
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'corsheaders.middleware.CorsPostCsrfMiddleware'
     ]
 
 ROOT_URLCONF = 'school_management.urls'
@@ -147,6 +149,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 CORS_ORIGIN_ALLOW_ALL = True 
 CORS_ALLOW_CREDENTIALS = True
 ALLOWED_HOSTS = ['*']
+from corsheaders.defaults import default_headers
+
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    'auth',
+]
 # CORS_ORIGIN_WHITELIST = [
 #     'http://localhost:3030',
 # ] # If this is used, then not need to use `CORS_ORIGIN_ALLOW_ALL = True`

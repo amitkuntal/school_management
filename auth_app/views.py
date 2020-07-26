@@ -11,7 +11,7 @@ import uuid
 from passlib.context import CryptContext
 import jwt
 import datetime
-from school_management.util import roleChecker, roleTimer
+from school_management.util import *
 from django.core.files import File
 import base64
 
@@ -27,8 +27,8 @@ class LoginView(APIView):
     def post(self, request):
         serializer  = LoginSerializer(data = request.data)
         if serializer.is_valid():
-            user = Login.objects.get(email__exact = serializer.data['email'])
             try :
+                user = Login.objects.get(email__exact = serializer.data['email'])
                 if pwd_context.verify (serializer.data['password'], user.password):
                     accessToken = jwt.encode({'exp':roleTimer(user.role),'email':user.email, 'role':user.role}, 'secret')
                     f = open('media/'+str(user.image), 'rb')
@@ -37,9 +37,10 @@ class LoginView(APIView):
                     f.close()
                     return Response(dict(accessToken=accessToken, name=user.name, role = user.role, image = data), status= status.HTTP_201_CREATED)
                 return Response( dict(code="Failed", message ="Invalid User Name or Password"), status = status.HTTP_401_UNAUTHORIZED)
+            except Login.DoesNotExist:
+                return Response( dict(code="Failed", message ="You don't have any account"), status = status.HTTP_401_UNAUTHORIZED)
             except:
                 return Response( dict(code="Failed", message ="Invalid User Name or Password"), status = status.HTTP_401_UNAUTHORIZED)
-
         return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)
 
     def get(self, request):
@@ -55,7 +56,7 @@ class LoginView(APIView):
 
 # Create your views here.
 class RegisterView(APIView):
-    def post(self, request):
+    def put(self, request):
             try:
                 authToken = request.headers["auth"]
                 payload  = jwt.decode(authToken,"secret")
@@ -80,11 +81,10 @@ class RegisterView(APIView):
             except:
                 return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
 
-
     def get(self, request):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    def put(self, request):
+    def post(self, request):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     def delete(self, request):
@@ -300,3 +300,88 @@ class RegisterStudentAdminView(APIView):
 
     def delete(self, request):
         return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+class GetSchoolsView(APIView):
+    def get(self, request):
+        try:
+            authToken = request.headers["auth"]
+            payload  = jwt.decode(authToken,"secret")
+            schools =  Login.objects.filter(role ='School').all()
+            schoolSerializer =  UserSerializer(schools, many = True)
+            schoolsData = schoolSerializer.data
+            for school in schoolsData:
+                school['image'] = readFiles(school['image'])
+            return Response(schoolsData, status = status.HTTP_200_OK)
+        except jwt.exceptions.ExpiredSignatureError:
+            return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.DecodeError:
+                return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
+
+    def put(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def post(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def delete(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+class ActivateUserAccount(APIView):
+    def post(self, request):
+        try:
+            email = request.data['email']
+            active =  request. data['active']
+            authToken = request.headers["auth"]
+            payload  = jwt.decode(authToken,"secret")
+            user =  Login.objects.get(email__exact = email)
+            user.active = active
+            user.save()
+            return Response(status = status.HTTP_200_OK)
+        except jwt.exceptions.ExpiredSignatureError:
+            return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.DecodeError:
+            return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
+        except Login.DoesNotExist:
+            return Response(dict(code="400", message="Could Not find account"), status= status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
+    
+    def put(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def get(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def delete(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+class CheckToken(APIView):
+    def get(self, request):
+        try:
+            authToken = request.headers["auth"]
+            payload  = jwt.decode(authToken,"secret")
+            user =  Login.objects.get(email__exact = payload["email"])
+            return Response(dict(passed= "pass"),status = status.HTTP_200_OK)
+        except jwt.exceptions.ExpiredSignatureError:
+            return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.DecodeError:
+            return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
+        except Login.DoesNotExist:
+            return Response(dict(code="400", message="Could Not find account"), status= status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
+    
+    def put(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def post(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def delete(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+
