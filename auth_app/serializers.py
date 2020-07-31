@@ -29,7 +29,7 @@ class AttendanceSerializer(serializers.ModelSerializer):
 class ClassSerializer(serializers.ModelSerializer):
     class Meta:
         model = Class
-        fields = ['schoolid', 'classname', 'section']
+        fields = ['id','schoolid', 'classname', 'section']
 
 class FeeDepositSerializer(serializers.ModelSerializer):
     class Meta:
@@ -66,6 +66,16 @@ class EmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = '__all__'
+
+class SubjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Subject
+        fields = '__all__'
+
+class AddSubjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Subject
+        fields = ['subjectname','classid']
         
 class ErrorMessageSerializer(serializers.Serializer):
     code = serializers.CharField(max_length=80)

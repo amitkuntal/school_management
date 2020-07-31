@@ -1,11 +1,18 @@
 import datetime
 from django.core.files import File
 import base64
+from passlib.context import CryptContext
 
+
+pwd_context = CryptContext(
+        schemes=["pbkdf2_sha256"],
+        default="pbkdf2_sha256",
+        pbkdf2_sha256__default_rounds=30000
+)
 
 def roleChecker(tokenrole,userrole):
     try:
-        roles={"Admin":1,"School":2,"Reception":3,"Teacher":4,"Student":5}
+        roles={"Admin":1,"School":2,"Reception":3,"Accountant":4,"Teacher":5,"Student":6}
         if (tokenrole =='Admin' and userrole == 'Admin'):
             return True
         elif (roles[tokenrole]<roles[userrole]):

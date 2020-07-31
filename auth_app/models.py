@@ -23,8 +23,8 @@ class Student(models.Model):
     id = models.UUIDField(primary_key=True, default= uuid.uuid4, editable=False, max_length=200)
     userid = models.UUIDField(max_length=200)
     schoolid = models.CharField(max_length=200)
-    classid = models.CharField(max_length=200)
-    dob = models.DateTimeField("mm-dd-yyyy")
+    classid = models.CharField(max_length=200, default='')
+    dob = models.DateField()
     fathername = models.CharField(max_length=100)
     mothername = models.CharField(max_length=100)
     mobileno1 = models.CharField(max_length=10)
@@ -35,7 +35,7 @@ class Student(models.Model):
     city = models.CharField(max_length=50)
     state =  models.CharField(max_length=50)
     zip = models.IntegerField()
-    admissiondate = models.DateTimeField("mm-dd-yyyy")
+    admissiondate = models.DateField()
     srno =  models.IntegerField()
     promotedclassid = models.CharField(max_length=100)
 
@@ -55,7 +55,7 @@ class FeeStructure(models.Model):
 class Class(models.Model):
     id = models.UUIDField(primary_key=True, default= uuid.uuid4, editable=False, max_length=200)
     schoolid = models.CharField(max_length=100)
-    classname = models.IntegerField()
+    classname = models.CharField(max_length=3)
     section = models.CharField(max_length=2,default="",blank=True)
     def __str__(self):
         return self.classname 
@@ -65,7 +65,7 @@ class Attendance(models.Model):
     userid = models.CharField(max_length=100)
     schoolid = models.CharField(max_length=100)
     classid = models.CharField(max_length=100)
-    attendancedate = models.DateTimeField("mm-dd-yyyy")
+    attendancedate = models.DateField()
     status = models.CharField(max_length=1)
 
     def __str__(self):
@@ -77,7 +77,7 @@ class FeeDeposit(models.Model):
     schoolid = models.CharField(max_length=100)
     classid = models.CharField(max_length=100)
     feestructureid = models.CharField(max_length=100)
-    depositdate = models.DateTimeField("mm-dd-yyyy")
+    depositdate = models.DateField()
     depositamount = models.CharField(max_length=100)
     def __str__(self):
         return self.userid
@@ -87,7 +87,7 @@ class Homework(models.Model):
     classid = models.CharField(max_length=100)
     teacherid = models.CharField(max_length=100)
     schoolid = models.CharField(max_length=100)
-    homeworkdate = models.DateTimeField("mm-dd-yyyy")
+    homeworkdate = models.DateField()
     homework = models.CharField(max_length=100)
     def __str__(self):
         return self.classid
@@ -98,8 +98,8 @@ class TransferCertificate(models.Model):
     schoolid = models.CharField(max_length=200)
     requestedby = models.CharField(max_length=100)
     approvedby = models.CharField(max_length=100)
-    requestdate = models.DateTimeField("mm-dd-yyyy")
-    approvedate = models.DateTimeField("mm-dd-yyyy")
+    requestdate = models.DateField()
+    approvedate = models.DateField()
     status = models.CharField(max_length=100)       
 
     def __str__(self):
@@ -134,7 +134,7 @@ class Employee(models.Model):
     schoolid = models.CharField(max_length=100)
     mobile = models.CharField(max_length=10)
     classid = models.CharField(max_length=100)
-    dob = models.DateTimeField("mm-dd-yyyy")
+    dob = models.DateField()
     fathername = models.CharField(max_length=100)
     mothername = models.CharField(max_length=100)
     address1 = models.CharField(max_length=100)
@@ -143,11 +143,19 @@ class Employee(models.Model):
     city = models.CharField(max_length=50)
     state =  models.CharField(max_length=50)
     zip = models.CharField(max_length=7)
-    dateOfJoining = models.DateTimeField("mm-dd-yyyy")
+    dateOfJoining = models.DateField()
     salary = models.IntegerField()
 
     def __str__(self):
         return self.userid
+
+class Subject(models.Model):
+    id = models.UUIDField(primary_key=True, default= uuid.uuid4, editable=False, max_length=100)
+    classid = models.CharField(max_length=100)
+    subjectname = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.classid
 
 
 class ErrorMessage():

@@ -347,7 +347,7 @@ class ActivateUserAccount(APIView):
         except Login.DoesNotExist:
             return Response(dict(code="400", message="Could Not find account"), status= status.HTTP_401_UNAUTHORIZED)
         except:
-            return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
+            return Response(dict(code="400", message="Something Went Token"), status= status.HTTP_401_UNAUTHORIZED)
     
     def put(self, request):
         return Response(status=status.HTTP_404_NOT_FOUND)
