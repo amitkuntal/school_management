@@ -166,6 +166,16 @@ class EducationPortal(models.Model):
     def __str__(self):
         return self.subjectid
 
+class EmployeeAttendance(models.Model):
+    id = models.UUIDField(primary_key=True, default= uuid.uuid4, editable=False, max_length=200)
+    userid = models.CharField(max_length=100)
+    attendancedate = models.DateField()
+    status = models.CharField(max_length=1)
+
+    def __str__(self):
+        return self.userid
+
+
 
 class ErrorMessage():
     code = models.CharField(max_length=80)

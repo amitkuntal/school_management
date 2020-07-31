@@ -86,6 +86,16 @@ class EducationPortalSerializer(serializers.ModelSerializer):
     class Meta:
         model = EducationPortal
         fields = '__all__'
+
+class AddEmployeeAttendanceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EmployeeAttendance
+        fields = ['userid', 'attendancedate','status']
+
+class EmployeeAttendanceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EmployeeAttendance
+        fields = '__all__'
         
 class ErrorMessageSerializer(serializers.Serializer):
     code = serializers.CharField(max_length=80)

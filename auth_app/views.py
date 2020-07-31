@@ -30,12 +30,14 @@ class LoginView(APIView):
             try :
                 user = Login.objects.get(email__exact = serializer.data['email'])
                 if pwd_context.verify (serializer.data['password'], user.password):
-                    accessToken = jwt.encode({'exp':roleTimer(user.role),'email':user.email, 'role':user.role}, 'secret')
-                    f = open('media/'+str(user.image), 'rb')
-                    image = File(f)
-                    data = base64.b64encode(image.read())
-                    f.close()
-                    return Response(dict(accessToken=accessToken, name=user.name, role = user.role, image = data), status= status.HTTP_201_CREATED)
+                    if(user.active):
+                        accessToken = jwt.encode({'exp':roleTimer(user.role),'email':user.email, 'role':user.role}, 'secret')
+                        f = open('media/'+str(user.image), 'rb')
+                        image = File(f)
+                        data = base64.b64encode(image.read())
+                        f.close()
+                        return Response(dict(accessToken=accessToken, name=user.name, role = user.role, image = data), status= status.HTTP_201_CREATED)
+                    return Response(dict(code="Failed", message = "Your Account is locked"))
                 return Response( dict(code="Failed", message ="Invalid User Name or Password"), status = status.HTTP_401_UNAUTHORIZED)
             except Login.DoesNotExist:
                 return Response( dict(code="Failed", message ="You don't have any account"), status = status.HTTP_401_UNAUTHORIZED)
@@ -121,14 +123,16 @@ class ProfileView(APIView):
                 payload  = jwt.decode(authToken,"secret")
                 role = payload['role']
                 user = Login.objects.get(email__exact = payload['email'])
+                user.email =  request.data["email"]
+                user.name =  request.data["name"]
+                user.save()
                 userid = user.id
                 #If Admin Wants to update there profile picture
                 if (role == "Admin"):
                     admin  = Admin.objects.get_or_create(userid = userid)[0]
                     admin.mobile = request.data["mobile"]
                     admin.save()
-                    return Response(status= status.HTTP_201_CREATED)
-                #If Schools wants to update there profile picture
+                      #If Schools wants to update there profile picture
                 elif (role == 'School'):
                     school = School.objects.get_or_create(userid = userid)[0]
                     school.address1 =  request.data["address1"]
@@ -138,8 +142,7 @@ class ProfileView(APIView):
                     school.state =  request.data["state"]
                     school.zip =  request.data["zip"]
                     school.save()
-                    return Response(status= status.HTTP_201_CREATED)
-                #If User role is school employee
+                     #If User role is school employee
                 elif (role in ['Accountant', 'Teacher','Reception']):
                     employee = Employee.objects.get_or_create(userid = userid)[0]
                     employee.mobile = request.data["mobile"]
@@ -154,7 +157,7 @@ class ProfileView(APIView):
                     employee.state = request.data["state"]
                     employee.zip = request.data["zip"]
                     employee.save()
-                    return Response(status= status.HTTP_201_CREATED)
+                return Response(dict(code="200", message="Profile Updated"), status= status.HTTP_201_CREATED)
             #Exception Handling
             except jwt.exceptions.ExpiredSignatureError:
                 return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
@@ -183,7 +186,7 @@ class ProfileView(APIView):
             elif (role == 'School'):
                 school = School.objects.get_or_create(userid = userid)[0]
                 additionalInfo = dict(address1 =school.address1 ,address2 = school.address2,address3 = school.address3,city = school.city,state = school.state,zip =school.zip)
-                response = dict(personalInfo=dict(name = user.name,email=user.email, image=data),additionalInfo=additionalInfo)
+                response = dict(personalInfo=dict(name = user.name,email=user.email, image=data, id = userid),additionalInfo=additionalInfo)
                 return Response(response,status= status.HTTP_201_CREATED)
             #If User role is Employe then Employee profile will return
             elif (role in ['Accountant', 'Teacher','Reception']):
