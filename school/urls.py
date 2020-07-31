@@ -7,5 +7,8 @@ urlpatterns = [
     path('class', RegisterClassView.as_view()),
     path('class/students', GetAllStudentFromClass.as_view()),
     path('employee', RegisterEmployeeView.as_view()),
-    path('subject', SubjectView.as_view())
+    path('subject', SubjectView.as_view()),
+    path('class/subject',ClassSubjectView.as_view()),
+    path('school/education',AddSchoolEducationView.as_view()),
+    path('get/subject/video',GetSchoolEducationView.as_view())
     ]

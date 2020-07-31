@@ -76,6 +76,16 @@ class AddSubjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subject
         fields = ['subjectname','classid']
+
+class AddEducationPortal(serializers.ModelSerializer):
+    class Meta:
+        model = EducationPortal
+        fields = ['subjectid','chaptername', 'videolink']
+
+class EducationPortalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EducationPortal
+        fields = '__all__'
         
 class ErrorMessageSerializer(serializers.Serializer):
     code = serializers.CharField(max_length=80)

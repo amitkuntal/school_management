@@ -334,7 +334,7 @@ class RegisterEmployeeView(APIView):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 class SubjectView(APIView):
-    def post(self, request):
+    def get(self, request):
         try:
             authToken = request.headers["auth"]
             payload  = jwt.decode(authToken,"secret")
@@ -343,26 +343,24 @@ class SubjectView(APIView):
             if(role=='School'):
                 school = Login.objects.get(email__exact = payload['email'])
                 schoolid = school.id
-            elif(role in ['Teacher','Accountant','Reception']):
-                user  = Login.objects.get(email__exact = payload['email'])
-                employee = Employee.objects.get(userid__exact = user.id)
-                schoolid = employee.schoolid
-            if(role in ['Teacher', 'Accountant', 'Reception', 'School']):
-                clases = Class.objects.filter(school__exact = schoolid).all()
-                classids = []
-                #Complete the query
+                classes =  ClassSerializer(Class.objects.filter(schoolid__exact = schoolid).all(), many=True)
+                data =  classes.data
+                for x in data:
+                    subjects = SubjectSerializer(Subject.objects.filter(classid__exact = x["id"]), many=True)
+                    x["subjects"] = subjects.data
+                return Response(data =  data, status= status.HTTP_200_OK)
             return Response(dict(code="400", message="Unauthrized Access"), status= status.HTTP_401_UNAUTHORIZED)
         except jwt.exceptions.ExpiredSignatureError:
             return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
         except jwt.exceptions.DecodeError:
                 return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
-        # except:
-        #     return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
 
     def put(self, request):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    def get(self, request):
+    def post(self, request):
         try:
             authToken = request.headers["auth"]
             payload  = jwt.decode(authToken,"secret")
@@ -373,6 +371,96 @@ class SubjectView(APIView):
                     addSubjectSerializer.save()
                     return Response(dict(code="200", message="Succesfully created"),status= status.HTTP_201_CREATED)
                 return Response(addSubjectSerializer.errors,  status= status.HTTP_401_UNAUTHORIZED)
+            return Response(dict(code="400", message="Unauthrized Access"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.ExpiredSignatureError:
+            return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.DecodeError:
+                return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
+
+
+
+    def delete(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+
+
+
+class ClassSubjectView(APIView):
+    def get(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    def put(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def post(self, request):
+        try:
+            authToken = request.headers["auth"]
+            payload  = jwt.decode(authToken,"secret")
+            role = payload['role']
+            if(role == 'School'):
+                subject = SubjectSerializer(Subject.objects.filter(classid__exact=request.data["classid"]), many= True)
+                return Response(subject.data, status= status.HTTP_200_OK)
+            return Response(dict(code="400", message="Unauthrized Access"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.ExpiredSignatureError:
+            return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.DecodeError:
+                return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
+        # except:
+        #     return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
+
+
+
+    def delete(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+class AddSchoolEducationView(APIView):
+    def get(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    def put(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def post(self, request):
+        try:
+            authToken = request.headers["auth"]
+            payload  = jwt.decode(authToken,"secret")
+            role = payload['role']
+            if(role in ['School', 'Reception','Teacher', 'Accountant']):
+                video = AddEducationPortal(data =  request.data)
+                if(video.is_valid()):
+                    video.save()
+                    return Response(dict(code="200", message="Video Added"), status = status.HTTP_200_OK)
+                return Response(video.errors, status= status.HTTP_400_BAD_REQUEST)
+            return Response(dict(code="400", message="Unauthrized Access"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.ExpiredSignatureError:
+            return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.DecodeError:
+                return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
+        # except:
+        #     return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
+
+
+
+    def delete(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+class GetSchoolEducationView(APIView):
+    def get(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    def put(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def post(self, request):
+        try:
+            authToken = request.headers["auth"]
+            payload  = jwt.decode(authToken,"secret")
+            role = payload['role']
+            if(role in ['School', 'Reception','Teacher', 'Accountant']):
+                video = EducationPortalSerializer(EducationPortal.objects.filter(subjectid__exact = request.data['subjectid']), many=True)
+                return Response(video.data, status = status.HTTP_200_OK)
             return Response(dict(code="400", message="Unauthrized Access"), status= status.HTTP_401_UNAUTHORIZED)
         except jwt.exceptions.ExpiredSignatureError:
             return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)

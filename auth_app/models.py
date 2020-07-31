@@ -157,6 +157,15 @@ class Subject(models.Model):
     def __str__(self):
         return self.classid
 
+class EducationPortal(models.Model):
+    id = models.UUIDField(primary_key=True, default= uuid.uuid4, editable=False, max_length=100)
+    subjectid = models.CharField(max_length=100)
+    chaptername = models.CharField(max_length=100)
+    videolink = models.CharField(max_length=500)
+
+    def __str__(self):
+        return self.subjectid
+
 
 class ErrorMessage():
     code = models.CharField(max_length=80)
