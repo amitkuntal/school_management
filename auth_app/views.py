@@ -386,5 +386,86 @@ class CheckToken(APIView):
     def delete(self, request):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
+class DeleteStudentView(APIView):
+    def post(self, request):
+        try:
+            authToken = request.headers["auth"]
+            payload  = jwt.decode(authToken,"secret")
+            if (payload["role"] == 'School'):
+                Login.objects.filter(id__exact = request.data["id"]).delete()
+                Student.objects.filter(userid__exact = request.data["id"]).delete()
+                return Response(dict(passed= "pass"),status = status.HTTP_200_OK)
+            return Response(dict(code="400", message="Unauthorized Request"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.ExpiredSignatureError:
+            return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.DecodeError:
+            return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
+        except Login.DoesNotExist:
+            return Response(dict(code="400", message="Could Not find account"), status= status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(dict(code="400", message="Something Went wrong"), status= status.HTTP_401_UNAUTHORIZED)
+    
+    def put(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def get(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def delete(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+class DeleteEmployeeView(APIView):
+    def post(self, request):
+        try:
+            authToken = request.headers["auth"]
+            payload  = jwt.decode(authToken,"secret")
+            if (payload["role"] == 'School'):
+                Login.objects.filter(id__exact = request.data["id"]).delete()
+                Employee.objects.filter(userid__exact = request.data["id"]).delete()
+                TimeTable.objects.filter(teacherid__exact = request.data["id"]).delete()
+                EmployeeAttendance.objects.filter(userid__exact = request.data["id"]).delete()
+                return Response(dict(passed= "pass"),status = status.HTTP_200_OK)
+            return Response(dict(code="400", message="Unauthorized Request"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.ExpiredSignatureError:
+            return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.DecodeError:
+            return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
+        except Login.DoesNotExist:
+            return Response(dict(code="400", message="Could Not find account"), status= status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
+    
+    def put(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def get(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def delete(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 
+class DeleteVideoView(APIView):
+    def post(self, request):
+        try:
+            authToken = request.headers["auth"]
+            payload  = jwt.decode(authToken,"secret")
+            if (payload["role"] == 'School'):
+                EducationPortal.objects.filter(id__exact = request.data["id"]).delete()
+                return Response(dict(passed= "pass"),status = status.HTTP_200_OK)
+            return Response(dict(code="400", message="Unauthorized Request"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.ExpiredSignatureError:
+            return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.DecodeError:
+            return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
+    
+    def put(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def get(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def delete(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
