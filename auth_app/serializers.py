@@ -60,7 +60,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = Login
-        fields = ['name', 'email', 'role' , 'image','active']
+        fields = ['name', 'email', 'role' , 'image','active','id']
 
 class EmployeeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -91,6 +91,11 @@ class AddEmployeeAttendanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = EmployeeAttendance
         fields = ['userid', 'attendancedate','status']
+
+class TimeTableSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TimeTable
+        fields = '__all__'
 
 class EmployeeAttendanceSerializer(serializers.ModelSerializer):
     class Meta:

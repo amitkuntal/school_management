@@ -6,6 +6,8 @@ from rest_framework import status
 from rest_framework.response import Response
 from django.http import HttpResponse, JsonResponse
 from auth_app.models import *
+from auth_app.serializers import *
+from school_management.util import *
 import jwt
 
 
@@ -33,6 +35,78 @@ class TestView(APIView):
 
     def delete(self, request):
         return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+class EmployeeAttendanceView(APIView):
+    def post(self, request):
+        try:
+            authToken = request.headers["auth"]
+            payload  = jwt.decode(authToken,"secret")
+            role = payload['role']
+            if(role == 'School'):
+                employeeAttendanceinfo =  EmployeeAttendance.objects.get_or_create(userid__exact = request.data['id'], attendancedate__exact = request.data['date'])[0]
+                employeeAttendanceinfo.status = request.data["status"]
+                employeeAttendanceinfo.userid = request.data["id"]
+                employeeAttendanceinfo.attendancedate = request.data["date"]
+                employeeAttendanceinfo.save()
+                return Response(dict(code="200", message="Success"), status= status.HTTP_200_OK)
+            return Response(dict(code="401", message="Unauthorized"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.ExpiredSignatureError:
+            return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.DecodeError:
+                return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
+        # except:
+        #     return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
+
+    def put(self, request):
+        try:
+            authToken = request.headers["auth"]
+            payload  = jwt.decode(authToken,"secret")
+            role = payload['role']
+            if(role == 'School'):
+                school = Login.objects.get(email__exact = payload['email'])
+                schoolid = school.id
+                employee = Employee.objects.filter(schoolid__exact = schoolid).all()
+                employeeids = []
+                for x in employee:
+                    employeeids.append(x.userid)
+                users =  Login.objects.filter(id__in = employeeids).all()
+                data = UserSerializer(users, many = True).data
+                for user in data:
+                    user['image'] = readFiles(user['image'])
+                    employeeattendance = EmployeeAttendanceSerializer(EmployeeAttendance.objects.filter(userid__exact = user["id"],attendancedate__range=[request.data["fromDate"], request.data["toDate"]]).order_by('attendancedate').all(),many=True)
+                    user["attendancedata"] = employeeattendance.data
+                return Response(data, status= status.HTTP_200_OK)
+            return Response(dict(code="401", message="Unauthorized"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.ExpiredSignatureError:
+            return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.DecodeError:
+                return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
+        # except:
+        #     return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
+    def get(self, request):
+        try:
+            authToken = request.headers["auth"]
+            payload  = jwt.decode(authToken,"secret")
+            role = payload['role']
+            school = Login.objects.filter(role='Admin').all()
+            student = Login.objects.filter(role= 'Student').all()
+            employee = Login.objects.filter(role__in = ['Teacher','Accountant','Reception'])
+            return Response(dict(school=len(school), student = len(student), employee = len(employee)),status=status.HTTP_200_OK)
+        except jwt.exceptions.ExpiredSignatureError:
+            return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.DecodeError:
+                return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
+
+    def delete(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+
+
+
 
 
 

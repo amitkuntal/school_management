@@ -10,5 +10,6 @@ urlpatterns = [
     path('subject', SubjectView.as_view()),
     path('class/subject',ClassSubjectView.as_view()),
     path('school/education',AddSchoolEducationView.as_view()),
-    path('get/subject/video',GetSchoolEducationView.as_view())
+    path('get/subject/video',GetSchoolEducationView.as_view()),
+    path('timetable',TimeTableView.as_view())
     ]

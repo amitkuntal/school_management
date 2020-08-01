@@ -1,5 +1,6 @@
 from django.db import models
 import uuid 
+import datetime
 
 class School(models.Model):
     id = models.UUIDField(primary_key=True, default= uuid.uuid4, editable=False, max_length=200)
@@ -169,11 +170,24 @@ class EducationPortal(models.Model):
 class EmployeeAttendance(models.Model):
     id = models.UUIDField(primary_key=True, default= uuid.uuid4, editable=False, max_length=200)
     userid = models.CharField(max_length=100)
-    attendancedate = models.DateField()
-    status = models.CharField(max_length=1)
+    attendancedate = models.DateField(default=datetime.date.today())
+    status = models.CharField(max_length=1,default='A')
 
     def __str__(self):
         return self.userid
+
+class TimeTable(models.Model):
+    id = models.UUIDField(primary_key=True, default= uuid.uuid4, editable=False, max_length=200)
+    schoolid = models.CharField(max_length=100)
+    classid = models.CharField(max_length=100)
+    subjectid = models.CharField(max_length=100)
+    period = models.CharField(max_length=1)
+    teacherid = models.CharField(max_length=100)
+    day = models.CharField(max_length=12)
+    
+    def __str__(self):
+        return self.userid
+
 
 
 
