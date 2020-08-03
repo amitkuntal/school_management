@@ -577,6 +577,82 @@ class TimeTableView(APIView):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 
+class GetStudentProfile(APIView):
+    def get(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    def put(self, request):
+        try:
+            authToken = request.headers["auth"]
+            payload  = jwt.decode(authToken,"secret")
+            role = payload['role']
+            if(role in ['School','Reception','Teacher','Accountant'] ):
+                userinfo = Login.objects.get_or_create(id__exact =  request.data["userid"])[0]
+                userinfo.name = request.data["name"]
+                userinfo.email = request.data["email"]
+                studentinfo = Student.objects.get_or_create(userid__exact = request.data["userid"])[0]
+                studentinfo.dob  =  request.data["dob"]
+                studentinfo.fathername = request.data["fathername"]
+                studentinfo.mothername = request.data["mothername"]
+                studentinfo.mobileno1 = request.data["mobileno1"]
+                studentinfo.mobileno2 = request.data["mobileno2"]
+                studentinfo.address1 = request.data["address1"]
+                studentinfo.address2 = request.data["address2"]
+                studentinfo.address3 = request.data["address3"]
+                studentinfo.city  = request.data["city"]
+                studentinfo.state =  request.data["state"]
+                studentinfo.zip = request.data["zip"]
+                studentinfo.addmissiondate = request.data["addmissiondate"]
+                studentinfo.srno = request.data["srno"]
+                studentinfo.promotedclassid  = request.data["promotedclassid"]
+                userinfo.save()
+                studentinfo.save()
+                return Response(dict(code="200", message="Success"), status = status.HTTP_200_OK)
+            return Response(dict(code="400", message="Unauthrized Access"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.ExpiredSignatureError:
+            return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.DecodeError:
+                return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
+        # except:
+        #     return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
+        
+    def post(self, request):
+        try:
+            authToken = request.headers["auth"]
+            payload  = jwt.decode(authToken,"secret")
+            role = payload['role']
+            schoolid = ''
+            if(role =='school'):
+                schoolinfo = Login.objects.get(email__exact = payload["email"])
+                schoolid = schoolinfo.id
+
+            if(role in ['Reception', 'Teacher', 'Accountant']):
+                employeinfo  = Login.objects.get(email__exact = payload['email'])
+                additionalinfo = Employee.objects.get(userid__exact = employeinfo.id)
+                schoolid = additionalinfo.schoolid
+            if(role in ['School','Reception','Teacher','Accountant']):
+                userinfo = UserSerializer(Login.objects.get(id__exact = request.data["id"]))
+                studentinfo = StudentSerializer(Student.objects.get(userid__exact = request.data["id"]))
+                userinfo = userinfo.data
+                userinfo["image"] = readFiles(userinfo["image"])
+                studentinfo = studentinfo.data
+                studentclass =  Class.objects.get(id__exact = studentinfo["promotedclassid"])
+                studentinfo["currentclass"] = studentclass.classname
+                classinfo =  ClassSerializer(Class.objects.filter(schoolid__exact = schoolid).all(), many=True)
+                return Response(dict(studentinfo  = studentinfo , userinfo = userinfo, classes = classinfo.data), status = status.HTTP_200_OK)
+            return Response(dict(code="400", message="Unauthrized Access"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.ExpiredSignatureError:
+            return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.DecodeError:
+                return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
+
+
+
+    def delete(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+
 
 
 

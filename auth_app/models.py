@@ -2,6 +2,11 @@ from django.db import models
 import uuid 
 import datetime
 
+def upload_path(instance, filename):
+    ext = filename.split('.')[-1]
+    filename = '{}.{}'.format(uuid.uuid4().hex, ext)
+    return '/'.join(['profile',filename])
+
 class School(models.Model):
     id = models.UUIDField(primary_key=True, default= uuid.uuid4, editable=False, max_length=200)
     userid = models.UUIDField(max_length=200)
@@ -66,8 +71,8 @@ class Attendance(models.Model):
     userid = models.CharField(max_length=100)
     schoolid = models.CharField(max_length=100)
     classid = models.CharField(max_length=100)
-    attendancedate = models.DateField()
-    status = models.CharField(max_length=1)
+    attendancedate = models.DateField(default=datetime.date.today())
+    status = models.CharField(max_length=1, default='A')
 
     def __str__(self):
         return self.userid
@@ -87,9 +92,9 @@ class Homework(models.Model):
     id = models.UUIDField(primary_key=True, default= uuid.uuid4, editable=False, max_length=200)
     classid = models.CharField(max_length=100)
     teacherid = models.CharField(max_length=100)
-    schoolid = models.CharField(max_length=100)
-    homeworkdate = models.DateField()
-    homework = models.CharField(max_length=100)
+    homeworkdate = models.DateField(default=datetime.date.today())
+    image = models.ImageField(blank=True, null = True, upload_to= upload_path)
+    homework = models.CharField(max_length=500)
     def __str__(self):
         return self.classid
 
@@ -106,10 +111,7 @@ class TransferCertificate(models.Model):
     def __str__(self):
         return self.requestedby
 
-def upload_path(instance, filename):
-    ext = filename.split('.')[-1]
-    filename = '{}.{}'.format(uuid.uuid4().hex, ext)
-    return '/'.join(['profile',filename])
+
 
 class Login(models.Model):
     Role = (('Admin','Admin'), 
@@ -186,7 +188,7 @@ class TimeTable(models.Model):
     day = models.CharField(max_length=12)
     
     def __str__(self):
-        return self.userid
+        return self.schoolid
 
 
 

@@ -14,7 +14,7 @@ class AdminSerializer(serializers.ModelSerializer):
 class StudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
-        fields = ['userid', 'schoolid', 'classid', 'dob', 'fathername', 'mothername', 'address1', 'address2' , 'address3', 'city', 'state', 'zip', 'admissiondate', 'srno', 'promotedclassid']
+        fields = '__all__'
 
 class FeeStructureSerializer(serializers.ModelSerializer):
     class Meta:
@@ -24,8 +24,7 @@ class FeeStructureSerializer(serializers.ModelSerializer):
 class AttendanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Attendance
-        fields = ['userid', 'classid', 'attendancedate' , 'status']
-
+        fields = '__all__'
 class ClassSerializer(serializers.ModelSerializer):
     class Meta:
         model = Class

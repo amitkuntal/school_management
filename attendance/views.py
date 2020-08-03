@@ -37,6 +37,81 @@ class TestView(APIView):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 
+class StudentAttendanceView(APIView):
+    def post(self, request):
+        try:
+            authToken = request.headers["auth"]
+            payload  = jwt.decode(authToken,"secret")
+            role = payload['role']
+            if(role in ['Teacher','Accountant', 'Reception']):
+                studentinfo = Student.objects.get(userid__exact = request.data["id"])
+                studentAttendance =  Attendance.objects.get_or_create(userid__exact = request.data['id'], attendancedate__exact = request.data['date'])[0]
+                studentAttendance.status = request.data["status"]
+                studentAttendance.userid = request.data["id"]
+                studentAttendance.attendancedate = request.data["date"]
+                studentAttendance.classid = studentinfo.promotedclassid
+                studentAttendance.schoolid = studentinfo.schoolid
+                studentAttendance.save()
+                return Response(dict(code="200", message="Success"), status= status.HTTP_200_OK)
+            return Response(dict(code="401", message="Unauthorized"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.ExpiredSignatureError:
+            return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.DecodeError:
+                return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
+        # except:
+        #     return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
+
+    def put(self, request):
+        try:
+            authToken = request.headers["auth"]
+            payload  = jwt.decode(authToken,"secret")
+            role = payload['role']
+            if(role in ['Teacher','Accountant', 'Reception']):
+                teacherinfo = Login.objects.get(email__exact = payload['email'])
+                employeeinfo = Employee.objects.get(userid__exact = teacherinfo.id)
+                schoolid = employeeinfo.schoolid
+                classid = employeeinfo.classid
+
+                students = Student.objects.filter(promotedclassid__exact = classid).all()
+                studentsids = []
+                for x in students:
+                    studentsids.append(x.userid)
+                users =  Login.objects.filter(id__in = studentsids).all()
+                data = UserSerializer(users, many = True).data
+                for user in data:
+                    user['image'] = readFiles(user['image'])
+                    print(Attendance.objects.filter(userid__exact = user["id"],attendancedate__range=[request.data["fromDate"], request.data["toDate"]]).order_by('attendancedate').all())
+                    studentAttendance = AttendanceSerializer(Attendance.objects.filter(userid__exact = user["id"],attendancedate__range=[request.data["fromDate"], request.data["toDate"]]).order_by('attendancedate').all(),many=True)
+                    user["attendancedata"] = studentAttendance.data
+                return Response(data, status= status.HTTP_200_OK)
+            return Response(dict(code="401", message="Unauthorized"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.ExpiredSignatureError:
+            return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.DecodeError:
+                return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
+        # except:
+        #     return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
+    
+    def get(self, request):
+        try:
+            authToken = request.headers["auth"]
+            payload  = jwt.decode(authToken,"secret")
+            role = payload['role']
+            school = Login.objects.filter(role='Admin').all()
+            student = Login.objects.filter(role= 'Student').all()
+            employee = Login.objects.filter(role__in = ['Teacher','Accountant','Reception'])
+            return Response(dict(school=len(school), student = len(student), employee = len(employee)),status=status.HTTP_200_OK)
+        except jwt.exceptions.ExpiredSignatureError:
+            return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.DecodeError:
+                return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
+
+    def delete(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+
 class EmployeeAttendanceView(APIView):
     def post(self, request):
         try:
