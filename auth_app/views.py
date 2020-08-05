@@ -146,7 +146,6 @@ class ProfileView(APIView):
                 elif (role in ['Accountant', 'Teacher','Reception']):
                     employee = Employee.objects.get_or_create(userid = userid)[0]
                     employee.mobile = request.data["mobile"]
-                    employee.classid = request.data["classid"]
                     employee.dob = request.data["dob"]
                     employee.fathername = request.data["fathername"]
                     employee.mothername = request.data["mothername"]

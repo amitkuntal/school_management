@@ -94,7 +94,7 @@ class Homework(models.Model):
     teacherid = models.CharField(max_length=100)
     homeworkdate = models.DateField(default=datetime.date.today())
     image = models.ImageField(blank=True, null = True, upload_to= upload_path)
-    homework = models.CharField(max_length=500)
+    homework = models.CharField(max_length=800, blank = True, null = True)
     def __str__(self):
         return self.classid
 

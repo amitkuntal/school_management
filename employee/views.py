@@ -203,6 +203,57 @@ class SubjectView(APIView):
             return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
 
 
+class HomeWorkView(APIView):
+    def get(self, request):
+        try:
+            authToken = request.headers["auth"]
+            payload  = jwt.decode(authToken,"secret")
+            role = payload['role']
+            if(role in ['Teacher', 'Accountant', 'Reception']):
+                userinfo = Login.objects.get(email__exact = payload['email'])
+                employee = Employee.objects.get(userid__exact = userinfo.id)
+                homeWork = AddHomeworkSerializer(Homework.objects.filter(classid__exact = employee.classid).order_by('homeworkdate').all(), many = True)
+                data = homeWork.data
+                for x in data:
+                    if x["image"] != '/media/null':
+                        x["image"] = readFiles(x["image"])
+                return Response(data = data, status= status.HTTP_200_OK)
+            return Response(dict(code="400", message="Unauthrized Access"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.ExpiredSignatureError:
+            return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.DecodeError:
+                return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
+        # except:
+        #     return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
+
+    def put(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def post(self, request):
+        try:
+            authToken = request.headers["auth"]
+            payload  = jwt.decode(authToken,"secret")
+            role = payload['role']
+            data  = request.data
+            if(role in ['Teacher', 'Accountant', 'Reception']):
+                userinfo = Login.objects.get(email__exact = payload["email"])
+                employeeInfo = Employee.objects.get(userid__exact = userinfo.id)
+                homework = Homework.objects.filter(classid__exact = employeeInfo.classid, homeworkdate__exact = request.data["homeworkdate"]).get_or_create()[0]
+                homework.homework = request.data["homework"]
+                homework.homeworkdate =request.data["homeworkdate"]
+                homework.teacherid = employeeInfo.userid
+                homework.classid = employeeInfo.classid
+                homework.image  = request.data["image"]
+                homework.save()
+                return Response(dict(code="200", message="Succesfully created"),status= status.HTTP_201_CREATED)
+            return Response(dict(code="400", message="Unauthrized Access"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.ExpiredSignatureError:
+            return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.DecodeError:
+                return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
+
 
 
 

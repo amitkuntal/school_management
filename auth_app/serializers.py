@@ -35,10 +35,10 @@ class FeeDepositSerializer(serializers.ModelSerializer):
         model = FeeDeposit
         fields = ['userid', 'feestructureid', 'depositdate' , 'depositamount']
 
-class HomeworkSerializer(serializers.ModelSerializer):
+class AddHomeworkSerializer(serializers.ModelSerializer):
     class Meta:
         model = Homework
-        fields = ['userid', 'homework', 'homeworkdate']        
+        fields = ['classid','teacherid', 'homework', 'homeworkdate', 'image']        
 
 class TranferCertificateSerializer(serializers.ModelSerializer):
     class Meta:
