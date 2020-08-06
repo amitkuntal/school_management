@@ -181,6 +181,36 @@ class EmployeeAttendanceView(APIView):
 
 
 
+class StudentSelftAttendanceView(APIView):
+
+    def post(self, request):
+        try:
+            authToken = request.headers["auth"]
+            payload  = jwt.decode(authToken,"secret")
+            role = payload['role']
+            studentinfo = UserSerializer(Login.objects.get(email__exact = payload['email']))
+            user = studentinfo.data
+            studentAttendance = AttendanceSerializer(Attendance.objects.filter(userid__exact = user["id"],attendancedate__range=[request.data["fromDate"], request.data["toDate"]]).order_by('attendancedate').all(),many=True)
+            user["attendancedata"] = studentAttendance.data
+            return Response(user, status= status.HTTP_200_OK)
+        except jwt.exceptions.ExpiredSignatureError:
+            return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.DecodeError:
+                return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
+        # except:
+        #     return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
+
+    def put(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def get(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def delete(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+
 
 
 

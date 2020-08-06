@@ -458,7 +458,7 @@ class GetSchoolEducationView(APIView):
             authToken = request.headers["auth"]
             payload  = jwt.decode(authToken,"secret")
             role = payload['role']
-            if(role in ['School', 'Reception','Teacher', 'Accountant']):
+            if(role in ['School', 'Reception','Teacher', 'Accountant', 'Student']):
                 video = EducationPortalSerializer(EducationPortal.objects.filter(subjectid__exact = request.data['subjectid']), many=True)
                 return Response(video.data, status = status.HTTP_200_OK)
             return Response(dict(code="400", message="Unauthrized Access"), status= status.HTTP_401_UNAUTHORIZED)

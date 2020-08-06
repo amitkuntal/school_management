@@ -195,10 +195,10 @@ class ProfileView(APIView):
                 return Response(response,status= status.HTTP_201_CREATED)
             #If user role is student then student profile will return
             elif (role == 'Student'):
-                student = Student.objects.get_or_create(userid = userid)
-                additionalInfo = dict(fathername = student.fathername,mothername=student.mothername,dob = student.dob,mobile=student.mobile,address1 =student.address1 ,address2 = student.address2,address3 = student.address3,city = student.city,state = student.state,zip =student.zip)
+                student = Student.objects.get_or_create(userid = userid)[0]
+                additionalInfo = dict(fathername = student.fathername,mothername=student.mothername,dob = student.dob,mobileno1=student.mobileno1,mobileno2=student.mobileno2,address1 =student.address1 ,address2 = student.address2,address3 = student.address3,city = student.city,state = student.state,zip =student.zip)
                 response = dict(personalInfo=dict(name = user.name,email=user.email, image=data),additionalInfo=additionalInfo)
-                return Response(dict(personalInfo = user, additionalinfo= student),status= status.HTTP_201_CREATED)
+                return Response(response,status= status.HTTP_201_CREATED)
         #Exception Handling
         except jwt.exceptions.ExpiredSignatureError:
             return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
