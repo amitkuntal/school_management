@@ -4,7 +4,7 @@ from .models import *
 class SchoolSerializer(serializers.ModelSerializer):
     class Meta:
         model = School
-        fields = ['userid', 'schoolname', 'address1', 'address2' , 'address3', 'city', 'state', 'zip']
+        fields = ['userid', 'address1', 'address2' , 'address3', 'city', 'state', 'zip']
 
 class AdminSerializer(serializers.ModelSerializer):
     class Meta:

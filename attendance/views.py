@@ -211,11 +211,38 @@ class StudentSelftAttendanceView(APIView):
 
 
 
+class StudentAttendanceViewForSchool(APIView):
+    def put(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
+    def post(self, request):
+        try:
+            authToken = request.headers["auth"]
+            payload  = jwt.decode(authToken,"secret")
+            role = payload['role']
+            if(role=='School'):
+                schoolinfo = Login.objects.get(email__exact = payload['email'])
+                students = Student.objects.filter(promotedclassid__exact = request.data["classid"]).all()
+                studentsids = []
+                for x in students:
+                    studentsids.append(x.userid)
+                users =  Login.objects.filter(id__in = studentsids).all()
+                data = UserSerializer(users, many = True).data
+                for user in data:
+                    user['image'] = readFiles(user['image'])
+                    studentAttendance = AttendanceSerializer(Attendance.objects.filter(userid__exact = user["id"],attendancedate__range=[request.data["fromDate"], request.data["toDate"]]).order_by('attendancedate').all(),many=True)
+                    user["attendancedata"] = studentAttendance.data
+                return Response(data, status= status.HTTP_200_OK)
+            return Response(dict(code="401", message="Unauthorized"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.ExpiredSignatureError:
+            return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.DecodeError:
+                return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
+        # except:
+        #     return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
+    
+    def get(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
-
-
-
-
-
-
+    def delete(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)

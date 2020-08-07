@@ -12,5 +12,6 @@ urlpatterns = [
     path('school/education',AddSchoolEducationView.as_view()),
     path('get/subject/video',GetSchoolEducationView.as_view()),
     path('timetable',TimeTableView.as_view()),
-    path('get/student/profile', GetStudentProfile.as_view())
+    path('get/student/profile', GetStudentProfile.as_view()),
+    path('profile', SchoolProfile.as_view())
     ]
