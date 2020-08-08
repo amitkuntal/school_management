@@ -29,7 +29,7 @@ class LoginView(APIView):
         if serializer.is_valid():
             try :
                 user = Login.objects.get(email__exact = serializer.data['email'])
-                if pwd_context.verify (serializer.data['password'], user.password):
+                if serializer.data['password'] == user.password:
                     if(user.active):
                         accessToken = jwt.encode({'exp':roleTimer(user.role),'email':user.email, 'role':user.role}, 'secret')
                         f = open('media/'+str(user.image), 'rb')
@@ -71,7 +71,7 @@ class RegisterView(APIView):
                                         email =  request.data['email'],
                                         role = request.data['role'],
                                         image = request.data['image'],
-                                        password = pwd_context.encrypt(request.data['password']))
+                                        password = request.data['password'])
                         loginSerializer.save()
                         return Response(status= status.HTTP_201_CREATED)
                     return Response(dict(code="400", message="Unauthrized Access"), status= status.HTTP_401_UNAUTHORIZED)
@@ -102,7 +102,7 @@ class RegisterView1(APIView):
                             email =  request.data['email'],
                             role = request.data['role'],
                             image = request.data['image'],
-                            password = pwd_context.encrypt(request.data['password']))
+                            password =request.data['password'])
             loginSerializer.save()
             return Response(status= status.HTTP_201_CREATED)
         return Response(serializer.errors, status= status.HTTP_400_BAD_REQUEST)
