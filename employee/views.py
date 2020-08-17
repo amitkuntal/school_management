@@ -62,14 +62,14 @@ class RegisterStudentView(APIView):
                                 email =  request.data['email'],
                                 role = request.data['role'],
                                 image = request.data['image'],
-                                password = pwd_context.encrypt(request.data['password'])))
+                                password = request.data['password']))
                 if(loginSerializer.is_valid()):
                     login  = Login(
                                 name = request.data['name'],
                                 email =  request.data['email'],
                                 role = request.data['role'],
                                 image = request.data['image'],
-                                password = pwd_context.encrypt(request.data['password']))
+                                password =request.data['password'])
                     studentSerializer = StudentSerializer(
                                         data = dict(
                                         userid = login.id, 
