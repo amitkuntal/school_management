@@ -10,39 +10,6 @@ from auth_app.serializers import *
 from school_management.util import *
 import jwt
 
-
-# class AllEmployee(APIView):
-#     def post(self, request):
-#         return Response(status=status.HTTP_404_NOT_FOUND)
-#     def put(self, request):
-#         return Response(status=status.HTTP_404_NOT_FOUND)
-
-#     def get(self, request):
-#         try:
-#             authToken = request.headers["auth"]
-#             payload  = jwt.decode(authToken,"secret")
-#             role = payload['role']
-#             if (role == 'School'):
-#                 user = Login.objects.get(email__exact = payload['email'])
-#                 userid =  user.id
-#                 employee = EmployeeSerializer(Employee.objects.filter(schoolid__exact = userid), many =True)
-#                 employeeids = []
-#                 for x in employee.data:
-#                     employeeids.append(x['userid'])
-#                 login =  Login.objects.filter()
-
-#             return Response(dict(code="401", message="Unauthrized"),status=status.HTTP_401_UNAUTHORIZED)
-#         except jwt.exceptions.ExpiredSignatureError:
-#             return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
-#         except jwt.exceptions.DecodeError:
-#                 return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
-#         except:
-#             return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
-
-#     def delete(self, request):
-#         return Response(status=status.HTTP_404_NOT_FOUND)
-
-
 class RegisterStudentView(APIView):
     def post(self, request):
         try:
@@ -61,14 +28,14 @@ class RegisterStudentView(APIView):
                                 name = request.data['name'],
                                 email =  request.data['email'],
                                 role = request.data['role'],
-                                image = request.data['image'],
+                                image = request.data['image'].file.read(),
                                 password = request.data['password']))
                 if(loginSerializer.is_valid()):
                     login  = Login(
                                 name = request.data['name'],
                                 email =  request.data['email'],
                                 role = request.data['role'],
-                                image = request.data['image'],
+                                image =resizeImage(request.data['image']),
                                 password =request.data['password'])
                     studentSerializer = StudentSerializer(
                                         data = dict(
@@ -215,7 +182,7 @@ class HomeWorkView(APIView):
                 homeWork = AddHomeworkSerializer(Homework.objects.filter(classid__exact = employee.classid).order_by('homeworkdate').all(), many = True)
                 data = homeWork.data
                 for x in data:
-                    if x["image"] != '/media/null':
+                    if(x["image"]):
                         x["image"] = readFiles(x["image"])
                 return Response(data = data, status= status.HTTP_200_OK)
             return Response(dict(code="400", message="Unauthrized Access"), status= status.HTTP_401_UNAUTHORIZED)
@@ -223,8 +190,8 @@ class HomeWorkView(APIView):
             return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
         except jwt.exceptions.DecodeError:
                 return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
-        # except:
-        #     return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
 
     def put(self, request):
         return Response(status=status.HTTP_404_NOT_FOUND)
@@ -243,7 +210,7 @@ class HomeWorkView(APIView):
                 homework.homeworkdate =request.data["homeworkdate"]
                 homework.teacherid = employeeInfo.userid
                 homework.classid = employeeInfo.classid
-                homework.image  = request.data["image"]
+                homework.image  = resizeImage(request.data["image"])
                 homework.save()
                 return Response(dict(code="200", message="Succesfully created"),status= status.HTTP_201_CREATED)
             return Response(dict(code="400", message="Unauthrized Access"), status= status.HTTP_401_UNAUTHORIZED)

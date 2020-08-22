@@ -30,14 +30,14 @@ class RegisterStudentView(APIView):
                                 name = request.data['name'],
                                 email =  request.data['email'],
                                 role = request.data['role'],
-                                image = request.data['image'],
+                                image = request.data['image'].file.read(),
                                 password = request.data['password']))
                 if(loginSerializer.is_valid()):
                     login  = Login(
                                 name = request.data['name'],
                                 email =  request.data['email'],
                                 role = request.data['role'],
-                                image = request.data['image'],
+                                image = resizeImage(request.data['image']),
                                 password = request.data['password'])
                     studentSerializer = StudentSerializer(
                                         data = dict(
@@ -88,8 +88,8 @@ class RegisterStudentView(APIView):
             return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
         except jwt.exceptions.DecodeError:
                 return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
-        # except:
-        #     return Response(dict(code="400", message="Something went"), status= status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
 
     def put(self, request):
         return Response(status=status.HTTP_404_NOT_FOUND)
@@ -244,14 +244,14 @@ class RegisterEmployeeView(APIView):
                                 name = request.data['name'],
                                 email =  request.data['email'],
                                 role = request.data['role'],
-                                image = request.data['image'],
+                                image = request.data['image'].file.read(),
                                 password = request.data['password']))
                 if(loginSerializer.is_valid()):
                     login  = Login(
                                 name = request.data['name'],
-                                email =  request.data['email'],
+                                email = request.data['email'],
                                 role = request.data['role'],
-                                image = request.data['image'],
+                                image = resizeImage(request.data['image']),
                                 password = request.data['password'])
                     employeeSerializer = EmployeeSerializer(
                                         data = dict(
@@ -296,8 +296,8 @@ class RegisterEmployeeView(APIView):
             return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
         except jwt.exceptions.DecodeError:
                 return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
-        # except:
-        #     return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
 
     def put(self, request):
         return Response(status=status.HTTP_404_NOT_FOUND)
@@ -407,8 +407,8 @@ class ClassSubjectView(APIView):
             return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
         except jwt.exceptions.DecodeError:
                 return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
-        # except:
-        #     return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
 
 
 
@@ -438,8 +438,8 @@ class AddSchoolEducationView(APIView):
             return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
         except jwt.exceptions.DecodeError:
                 return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
-        # except:
-        #     return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
 
 
 
@@ -466,8 +466,8 @@ class GetSchoolEducationView(APIView):
             return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
         except jwt.exceptions.DecodeError:
                 return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
-        # except:
-        #     return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
 
 
 
@@ -543,8 +543,8 @@ class TimeTableView(APIView):
             return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
         except jwt.exceptions.DecodeError:
                 return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
-        # except:
-        #     return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
         
     def post(self, request):
         try:
@@ -612,8 +612,8 @@ class GetStudentProfile(APIView):
             return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
         except jwt.exceptions.DecodeError:
                 return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
-        # except:
-        #     return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
         
     def post(self, request):
         try:
@@ -673,8 +673,8 @@ class SchoolProfile(APIView):
             return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
         except jwt.exceptions.DecodeError:
                 return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
-        # except:
-        #     return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
         
     def post(self, request):
         try:
@@ -712,10 +712,4 @@ class SchoolProfile(APIView):
 
     def delete(self, request):
         return Response(status=status.HTTP_404_NOT_FOUND)
-
-
-
-
-
-
 

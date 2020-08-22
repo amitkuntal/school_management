@@ -2,7 +2,8 @@ import datetime
 from django.core.files import File
 import base64
 from passlib.context import CryptContext
-
+from PIL import Image
+import io
 
 pwd_context = CryptContext(
         schemes=["pbkdf2_sha256"],
@@ -36,3 +37,11 @@ def readFiles(fileName):
     data = base64.b64encode(image.read())
     f.close()
     return data
+
+def resizeImage(image):
+    import PIL.Image as Image
+    pil_im = Image.open(image)
+    b = io.BytesIO()
+    pil_im.save(b, 'jpeg', quality=50)
+    im_bytes = b.getvalue()
+    return im_bytes

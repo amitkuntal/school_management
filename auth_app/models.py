@@ -93,7 +93,7 @@ class Homework(models.Model):
     classid = models.CharField(max_length=100)
     teacherid = models.CharField(max_length=100)
     homeworkdate = models.DateField(default=datetime.date.today())
-    image = models.ImageField(blank=True, null = True, upload_to= upload_path)
+    image = models.BinaryField(blank=True)
     homework = models.CharField(max_length=800, blank = True, null = True)
     def __str__(self):
         return self.classid
@@ -122,7 +122,7 @@ class Login(models.Model):
             ('Student','Student'))
     id = models.UUIDField(primary_key=True, default= uuid.uuid4, editable=False, max_length=200)
     name = models.CharField(max_length=80)
-    image = models.ImageField(blank=False, null = False, upload_to= upload_path)
+    image = models.BinaryField(blank=False)
     email  = models.CharField(max_length=200, unique=True)
     password =  models.CharField(max_length=200)
     role = models.CharField(max_length=200, choices=Role, default='Student')

@@ -33,17 +33,15 @@ class LoginView(APIView):
                 if serializer.data['password'] == user.password:
                     if(user.active):
                         accessToken = jwt.encode({'exp':roleTimer(user.role),'email':user.email, 'role':user.role}, 'secret')
-                        f = open('media/'+str(user.image), 'rb')
-                        image = File(f)
-                        data = base64.b64encode(image.read())
-                        f.close()
+                        image = user.image
+                        data = base64.b64encode(image)
                         return Response(dict(accessToken=accessToken, name=user.name, role = user.role, image = data), status= status.HTTP_201_CREATED)
                     return Response(dict(code="Failed", message = "Your Account is locked"))
                 return Response( dict(code="Failed", message ="Invalid User Name or Password"), status = status.HTTP_401_UNAUTHORIZED)
             except Login.DoesNotExist:
                 return Response( dict(code="Failed", message ="You don't have any account"), status = status.HTTP_401_UNAUTHORIZED)
             except:
-                return Response( dict(code="Failed", message ="Invalid User Name or Password"), status = status.HTTP_401_UNAUTHORIZED)
+                return Response( dict(code="Failed", message ="Something went wrong"), status = status.HTTP_401_UNAUTHORIZED)
         return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)
 
     def get(self, request):
@@ -71,7 +69,7 @@ class RegisterView(APIView):
                                         name = request.data['name'],
                                         email =  request.data['email'],
                                         role = request.data['role'],
-                                        image = request.data['image'],
+                                        image = resizeImage(request.data['image']),#request.data['image'].file.read(),
                                         password =request.data['password'])
                         loginSerializer.save()
                         return Response(status= status.HTTP_201_CREATED)
@@ -102,7 +100,7 @@ class RegisterView1(APIView):
                             name = request.data['name'],
                             email =  request.data['email'],
                             role = request.data['role'],
-                            image = request.data['image'],
+                            image = request.data['image'].file.read(),
                             password =request.data['password'])
             loginSerializer.save()
             return Response(status= status.HTTP_201_CREATED)
@@ -173,10 +171,7 @@ class ProfileView(APIView):
             role = payload['role']
             user = Login.objects.get(email__exact = payload['email'])
             userid = user.id
-            f = open('media/'+str(user.image), 'rb')
-            image = File(f)
-            data = base64.b64encode(image.read())
-            f.close()
+            data = base64.b64encode(user.image)
             #If user role is admin then admin profile will return
             if (role == "Admin"):
                 admin  = Admin.objects.get_or_create(userid = userid)[0]
@@ -205,8 +200,8 @@ class ProfileView(APIView):
             return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
         except jwt.exceptions.DecodeError:
                 return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
-        # except:
-        #     return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(dict(code="500", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
     
 
     def post(self, request):
