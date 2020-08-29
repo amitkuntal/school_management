@@ -31,7 +31,7 @@ class TestView(APIView):
         except jwt.exceptions.DecodeError:
                 return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
         except:
-            return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
+            return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
 
     def delete(self, request):
         return Response(status=status.HTTP_404_NOT_FOUND)
@@ -52,8 +52,8 @@ class SubjectView(APIView):
             return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
         except jwt.exceptions.DecodeError:
                 return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
-        # except:
-        #     return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
 
     def put(self, request):
         return Response(status=status.HTTP_404_NOT_FOUND)
@@ -76,16 +76,13 @@ class HomeWorkView(APIView):
             student = Student.objects.get(userid__exact = userinfo.id)
             homeWork = AddHomeworkSerializer(Homework.objects.filter(classid__exact = student.promotedclassid).order_by('homeworkdate').all(), many = True)
             data = homeWork.data
-            for x in data:
-                if x["image"] != '/media/null':
-                    x["image"] = readFiles(x["image"])
             return Response(data = data, status= status.HTTP_200_OK)
         except jwt.exceptions.ExpiredSignatureError:
             return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
         except jwt.exceptions.DecodeError:
                 return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
-        # except:
-        #     return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
 
     def put(self, request):
         return Response(status=status.HTTP_404_NOT_FOUND)

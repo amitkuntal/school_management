@@ -58,8 +58,8 @@ class StudentAttendanceView(APIView):
             return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
         except jwt.exceptions.DecodeError:
                 return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
-        # except:
-        #     return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
 
     def put(self, request):
         try:
@@ -79,8 +79,6 @@ class StudentAttendanceView(APIView):
                 users =  Login.objects.filter(id__in = studentsids).all()
                 data = UserSerializer(users, many = True).data
                 for user in data:
-                    user['image'] = readFiles(user['image'])
-                    print(Attendance.objects.filter(userid__exact = user["id"],attendancedate__range=[request.data["fromDate"], request.data["toDate"]]).order_by('attendancedate').all())
                     studentAttendance = AttendanceSerializer(Attendance.objects.filter(userid__exact = user["id"],attendancedate__range=[request.data["fromDate"], request.data["toDate"]]).order_by('attendancedate').all(),many=True)
                     user["attendancedata"] = studentAttendance.data
                 return Response(data, status= status.HTTP_200_OK)
@@ -89,8 +87,8 @@ class StudentAttendanceView(APIView):
             return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
         except jwt.exceptions.DecodeError:
                 return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
-        # except:
-        #     return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
     
     def get(self, request):
         try:
@@ -130,8 +128,8 @@ class EmployeeAttendanceView(APIView):
             return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
         except jwt.exceptions.DecodeError:
                 return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
-        # except:
-        #     return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
 
     def put(self, request):
         try:
@@ -157,8 +155,8 @@ class EmployeeAttendanceView(APIView):
             return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
         except jwt.exceptions.DecodeError:
                 return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
-        # except:
-        #     return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
     def get(self, request):
         try:
             authToken = request.headers["auth"]
@@ -197,8 +195,8 @@ class StudentSelftAttendanceView(APIView):
             return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
         except jwt.exceptions.DecodeError:
                 return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
-        # except:
-        #     return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
 
     def put(self, request):
         return Response(status=status.HTTP_404_NOT_FOUND)
@@ -229,7 +227,6 @@ class StudentAttendanceViewForSchool(APIView):
                 users =  Login.objects.filter(id__in = studentsids).all()
                 data = UserSerializer(users, many = True).data
                 for user in data:
-                    user['image'] = readFiles(user['image'])
                     studentAttendance = AttendanceSerializer(Attendance.objects.filter(userid__exact = user["id"],attendancedate__range=[request.data["fromDate"], request.data["toDate"]]).order_by('attendancedate').all(),many=True)
                     user["attendancedata"] = studentAttendance.data
                 return Response(data, status= status.HTTP_200_OK)
@@ -238,8 +235,8 @@ class StudentAttendanceViewForSchool(APIView):
             return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
         except jwt.exceptions.DecodeError:
                 return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
-        # except:
-        #     return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
     
     def get(self, request):
         return Response(status=status.HTTP_404_NOT_FOUND)

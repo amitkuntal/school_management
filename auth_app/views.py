@@ -29,7 +29,6 @@ class LoginView(APIView):
         if serializer.is_valid():
             try :
                 user = Login.objects.get(email__exact = serializer.data['email'])
-                print(user.password)
                 if serializer.data['password'] == user.password:
                     if(user.active):
                         accessToken = jwt.encode({'exp':roleTimer(user.role),'email':user.email, 'role':user.role}, 'secret')
@@ -69,7 +68,7 @@ class RegisterView(APIView):
                                         name = request.data['name'],
                                         email =  request.data['email'],
                                         role = request.data['role'],
-                                        image = resizeImage(request.data['image']),#request.data['image'].file.read(),
+                                        image = resizeImage(request.data['image']),
                                         password =request.data['password'])
                         loginSerializer.save()
                         return Response(status= status.HTTP_201_CREATED)
@@ -80,7 +79,7 @@ class RegisterView(APIView):
             except jwt.exceptions.DecodeError:
                  return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
             except:
-                return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
+                return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
 
     def get(self, request):
         return Response(status=status.HTTP_404_NOT_FOUND)
@@ -161,8 +160,8 @@ class ProfileView(APIView):
                 return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
             except jwt.exceptions.DecodeError:
                  return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
-            # except:
-            #     return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
+            except:
+                return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
 
     def get(self, request):
         try:
@@ -288,7 +287,7 @@ class RegisterStudentAdminView(APIView):
         except jwt.exceptions.DecodeError:
                 return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
         except:
-            return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
+            return Response(dict(code="400", message="Something went Token"), status= status.HTTP_401_UNAUTHORIZED)
 
     def put(self, request):
         return Response(status=status.HTTP_404_NOT_FOUND)
@@ -316,7 +315,7 @@ class GetSchoolsView(APIView):
         except jwt.exceptions.DecodeError:
                 return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
         except:
-            return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
+            return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
 
     def put(self, request):
         return Response(status=status.HTTP_404_NOT_FOUND)
@@ -345,7 +344,7 @@ class ActivateUserAccount(APIView):
         except Login.DoesNotExist:
             return Response(dict(code="400", message="Could Not find account"), status= status.HTTP_401_UNAUTHORIZED)
         except:
-            return Response(dict(code="400", message="Something Went Token"), status= status.HTTP_401_UNAUTHORIZED)
+            return Response(dict(code="400", message="Something Went wrong"), status= status.HTTP_401_UNAUTHORIZED)
     
     def put(self, request):
         return Response(status=status.HTTP_404_NOT_FOUND)
@@ -370,7 +369,7 @@ class CheckToken(APIView):
         except Login.DoesNotExist:
             return Response(dict(code="400", message="Could Not find account"), status= status.HTTP_401_UNAUTHORIZED)
         except:
-            return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
+            return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
     
     def put(self, request):
         return Response(status=status.HTTP_404_NOT_FOUND)
@@ -428,7 +427,7 @@ class DeleteEmployeeView(APIView):
         except Login.DoesNotExist:
             return Response(dict(code="400", message="Could Not find account"), status= status.HTTP_401_UNAUTHORIZED)
         except:
-            return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
+            return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
     
     def put(self, request):
         return Response(status=status.HTTP_404_NOT_FOUND)
@@ -454,7 +453,7 @@ class DeleteVideoView(APIView):
         except jwt.exceptions.DecodeError:
             return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
         except:
-            return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
+            return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
     
     def put(self, request):
         return Response(status=status.HTTP_404_NOT_FOUND)

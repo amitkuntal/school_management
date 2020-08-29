@@ -174,7 +174,7 @@ class RegisterClassView(APIView):
         except jwt.exceptions.DecodeError:
                 return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
         except:
-            return Response(dict(code="400", message="Something went wrong Token"), status= status.HTTP_401_UNAUTHORIZED)
+            return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
 
     def delete(self, request):
         return Response(status=status.HTTP_404_NOT_FOUND)
@@ -203,8 +203,6 @@ class GetAllStudentFromClass(APIView):
                 users =  Login.objects.filter(id__in = studentids).all()
                 userSerializer = UserSerializer(users, many = True)
                 userdata =  userSerializer.data
-                for user in userdata:
-                    user['image'] = readFiles(user['image'])
                 return Response(userdata, status= status.HTTP_201_CREATED)
             return Response(dict(code="400", message="Unauthrized Access"), status= status.HTTP_401_UNAUTHORIZED)
         except jwt.exceptions.ExpiredSignatureError:
@@ -317,8 +315,6 @@ class RegisterEmployeeView(APIView):
                     employeeids.append(x.userid)
                 users =  Login.objects.filter(id__in = employeeids).all()
                 data = UserSerializer(users, many = True).data
-                for user in data:
-                    user['image'] = readFiles(user['image'])
                 return Response(data,status= status.HTTP_201_CREATED)
             return Response(dict(code="400", message="Unauthrized Access"), status= status.HTTP_401_UNAUTHORIZED)
         except jwt.exceptions.ExpiredSignatureError:
@@ -633,7 +629,6 @@ class GetStudentProfile(APIView):
                 userinfo = UserSerializer(Login.objects.get(id__exact = request.data["id"]))
                 studentinfo = StudentSerializer(Student.objects.get(userid__exact = request.data["id"]))
                 userinfo = userinfo.data
-                userinfo["image"] = readFiles(userinfo["image"])
                 studentinfo = studentinfo.data
                 studentclass =  Class.objects.get(id__exact = studentinfo["promotedclassid"])
                 studentinfo["currentclass"] = studentclass.classname

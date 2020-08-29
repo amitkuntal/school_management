@@ -33,10 +33,3 @@ class TestView(APIView):
 
     def delete(self, request):
         return Response(status=status.HTTP_404_NOT_FOUND)
-
-
-
-
-
-
-

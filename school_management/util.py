@@ -32,7 +32,7 @@ def roleTimer(tokenrole):
 
 
 def readFiles(fileName):
-    data = base64.b64encode(image)
+    data = base64.b64encode(fileName)
     return data
 
 def resizeImage(image):

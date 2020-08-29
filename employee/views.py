@@ -109,8 +109,6 @@ class RegisterStudentView(APIView):
                 users =  Login.objects.filter(id__in = studentids).all()
                 userSerializer = UserSerializer(users, many = True)
                 userdata =  userSerializer.data
-                for user in userdata:
-                    user['image'] = readFiles(user['image'])
                 return Response(userdata, status= status.HTTP_201_CREATED)
             return Response(dict(code="400", message="Unauthrized Access"), status= status.HTTP_401_UNAUTHORIZED)
         except jwt.exceptions.ExpiredSignatureError:
@@ -181,9 +179,6 @@ class HomeWorkView(APIView):
                 employee = Employee.objects.get(userid__exact = userinfo.id)
                 homeWork = AddHomeworkSerializer(Homework.objects.filter(classid__exact = employee.classid).order_by('homeworkdate').all(), many = True)
                 data = homeWork.data
-                for x in data:
-                    if(x["image"]):
-                        x["image"] = readFiles(x["image"])
                 return Response(data = data, status= status.HTTP_200_OK)
             return Response(dict(code="400", message="Unauthrized Access"), status= status.HTTP_401_UNAUTHORIZED)
         except jwt.exceptions.ExpiredSignatureError:
@@ -210,7 +205,10 @@ class HomeWorkView(APIView):
                 homework.homeworkdate =request.data["homeworkdate"]
                 homework.teacherid = employeeInfo.userid
                 homework.classid = employeeInfo.classid
-                homework.image  = resizeImage(request.data["image"])
+                if request.data["image"] != 'null':
+                    homework.image  = resizeImage(request.data["image"])
+                else:
+                    homework.image = None 
                 homework.save()
                 return Response(dict(code="200", message="Succesfully created"),status= status.HTTP_201_CREATED)
             return Response(dict(code="400", message="Unauthrized Access"), status= status.HTTP_401_UNAUTHORIZED)
@@ -220,7 +218,3 @@ class HomeWorkView(APIView):
                 return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
         except:
             return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
-
-
-
-
