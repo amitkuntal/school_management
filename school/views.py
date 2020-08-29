@@ -212,8 +212,8 @@ class GetAllStudentFromClass(APIView):
             return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
         except Student.DoesNotExist:
             return Response(dict(code="400", message="Students not found"), status= status.HTTP_401_UNAUTHORIZED)
-        except:
-            return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
+        # except:
+        #     return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
 
     def put(self, request):
         return Response(status=status.HTTP_404_NOT_FOUND)
