@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '36ujt2b3o3ck=hpmo*%@9-px9y0=5cibru#1ugo713uryfqy1a'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['atlantisbackend.herokuapp.com','localhost']
 
