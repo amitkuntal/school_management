@@ -647,6 +647,73 @@ class GetStudentProfile(APIView):
     def delete(self, request):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
+class GetEmployeeProfile(APIView):
+    def get(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    def put(self, request):
+        try:
+            authToken = request.headers["auth"]
+            payload  = jwt.decode(authToken,"secret")
+            role = payload['role']
+            if(role in ['School','Reception','Teacher','Accountant'] ):
+                userinfo = Login.objects.get_or_create(id__exact =  request.data["userid"])[0]
+                userinfo.name = request.data["name"]
+                userinfo.email = request.data["email"]
+                employeeinfo = Employee.objects.get_or_create(userid__exact = request.data["userid"])[0]
+                employeeinfo.dob  =  request.data["dob"]
+                employeeinfo.fathername = request.data["fathername"]
+                employeeinfo.mothername = request.data["mothername"]
+                employeeinfo.mobile = request.data["mobile"]
+                employeeinfo.address1 = request.data["address1"]
+                employeeinfo.address2 = request.data["address2"]
+                employeeinfo.address3 = request.data["address3"]
+                employeeinfo.city  = request.data["city"]
+                employeeinfo.state =  request.data["state"]
+                employeeinfo.zip = request.data["zip"]
+                employeeinfo.dateOfJoining = request.data["dateOfJoining"]
+                employeeinfo.salary = request.data["salary"]
+                employeeinfo.classid  = request.data["classid"]
+                userinfo.save()
+                employeeinfo.save()
+                return Response(dict(code="200", message="Success"), status = status.HTTP_200_OK)
+            return Response(dict(code="400", message="Unauthrized Access"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.ExpiredSignatureError:
+            return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.DecodeError:
+                return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
+        # except:
+        #     return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
+        
+    def post(self, request):
+        try:
+            authToken = request.headers["auth"]
+            payload  = jwt.decode(authToken,"secret")
+            role = payload['role']
+            schoolid = ''
+            if(role =='School'):
+                schoolinfo = Login.objects.get(email__exact = payload["email"])
+                schoolid = schoolinfo.id
+                userinfo = UserSerializer(Login.objects.get(id__exact = request.data["id"]))
+                employeedata = EmployeeSerializer(Employee.objects.get(userid__exact = request.data["id"]))
+                userinfo = userinfo.data
+                employeedata = employeedata.data
+                employeeclass =  Class.objects.get(id__exact = employeedata["classid"])
+                employeedata["currentclass"] = employeeclass.classname
+                classinfo =  ClassSerializer(Class.objects.filter(schoolid__exact = schoolid).all(), many=True)
+                return Response(dict(employeinfo  = employeedata , userinfo = userinfo, classes = classinfo.data), status = status.HTTP_200_OK)
+            return Response(dict(code="400", message="Unauthrized Access"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.ExpiredSignatureError:
+            return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.DecodeError:
+                return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
+
+
+
+    def delete(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
 
 
 class SchoolProfile(APIView):

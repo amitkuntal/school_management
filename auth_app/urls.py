@@ -14,7 +14,9 @@ urlpatterns = [
     path('register/1', RegisterView1.as_view()),
     path('delete/student', DeleteStudentView.as_view()),
     path('delete/employee',DeleteEmployeeView.as_view()),
-    path('delete/video', DeleteVideoView.as_view())
+    path('delete/video', DeleteVideoView.as_view()),
+    path('delete/subject', DeleteSubjectView.as_view()),
+    path('delete/class', DeleteClassView.as_view())
 
 
 ]
