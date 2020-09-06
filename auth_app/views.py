@@ -361,7 +361,9 @@ class CheckToken(APIView):
             authToken = request.headers["auth"]
             payload  = jwt.decode(authToken,"secret")
             user =  Login.objects.get(email__exact = payload["email"])
-            return Response(dict(passed= "pass"),status = status.HTTP_200_OK)
+            if(user.active):
+                return Response(dict(passed= "pass"),status = status.HTTP_200_OK)
+            return Response(dict(code="400", message="Account blocked"), status= status.HTTP_401_UNAUTHORIZED)
         except jwt.exceptions.ExpiredSignatureError:
             return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
         except jwt.exceptions.DecodeError:
