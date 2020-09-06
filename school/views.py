@@ -9,6 +9,7 @@ from auth_app.models import *
 from auth_app.serializers import *
 from school_management.util import *
 import jwt
+import openpyxl
 
 
 class RegisterStudentView(APIView):
@@ -762,6 +763,43 @@ class SchoolProfile(APIView):
                 studentinfo["currentclass"] = studentclass.classname
                 classinfo =  ClassSerializer(Class.objects.filter(schoolid__exact = schoolid).all(), many=True)
                 return Response(dict(studentinfo  = studentinfo , userinfo = userinfo, classes = classinfo.data), status = status.HTTP_200_OK)
+            return Response(dict(code="400", message="Unauthrized Access"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.ExpiredSignatureError:
+            return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.DecodeError:
+                return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
+
+
+
+    def delete(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+class UploadExcel(APIView):
+    def put(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    def get(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def post(self, request):
+        try:
+            authToken = request.headers["auth"]
+            payload  = jwt.decode(authToken,"secret")
+            role = payload['role']
+            if(role =='School'):
+                excel_file = request.FILES["file"]
+                wb = openpyxl.load_workbook(excel_file)
+                worksheet = wb["Sheet1"]
+                for row in worksheet.iter_rows():
+                    link = row[1].value
+                    link = link.split("v=")[1]
+                    link = link.split("&")[0]
+                    link = "https://www.youtube.com/embed/"+link
+                    tutorial = EducationPortal(subjectid = request.data["subjectid"], chaptername=row[0].value, videolink=link)
+                    tutorial.save()
+                return Response(dict(code="200", message="pass"), status = status.HTTP_200_OK)
             return Response(dict(code="400", message="Unauthrized Access"), status= status.HTTP_401_UNAUTHORIZED)
         except jwt.exceptions.ExpiredSignatureError:
             return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
