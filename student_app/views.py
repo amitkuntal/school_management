@@ -90,3 +90,56 @@ class HomeWorkView(APIView):
     def post(self, request):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
+
+class SubmitQuestion(APIView):
+    def post(self, request):
+        try:
+            authToken = request.headers["auth"]
+            payload  = jwt.decode(authToken,"secret")
+            userinfo = Login.objects.get(email__exact = payload['email'])
+            question = Question.objects.get(id__exact = request.data["id"])
+            submission = Submission(userid=userinfo.id, questionid = question.id, submission = request.data["answer"])
+            result = Result.objects.get_or_create(userid__exact = userinfo.id, testid__exact = question.testid)
+            result.userid = userinfo.id
+            result.testid = question.testid
+            if(question.answer == request.data["answer"]):
+                result.score = result.score + int(question.marks)
+            submission.save()
+            result.save()
+            return Response(dict(code="200", message="Success"), status= status.HTTP_200_OK)
+        except jwt.exceptions.ExpiredSignatureError:
+            return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.DecodeError:
+                return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
+
+    def put(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def get(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+class GetStudentScore(APIView):
+    def post(self, request):
+        try:
+            authToken = request.headers["auth"]
+            payload  = jwt.decode(authToken,"secret")
+            userinfo = Login.objects.get(email__exact = payload['email'])
+            result = ResultSerializer(Result.objects.get(userid__exact = userinfo.id, testid__exact = request.data["testid"]))
+            return Response(result.data, status= status.HTTP_200_OK)
+        except jwt.exceptions.ExpiredSignatureError:
+            return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.DecodeError:
+                return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
+
+    def put(self, request):
+        return Response(status = status.HTTP_404_NOT_FOUND)
+
+    def get(self, request):
+        return Response(status = status.HTTP_404_NOT_FOUND)
+
+    def delete(self, request):
+        return Response(status = status.HTTP_404_NOT_FOUND)

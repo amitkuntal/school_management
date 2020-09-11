@@ -190,6 +190,51 @@ class TimeTable(models.Model):
     def __str__(self):
         return self.schoolid
 
+class Test(models.Model):
+    id = models.UUIDField(primary_key=True, default= uuid.uuid4, editable=False, max_length=200)
+    classid = models.CharField(max_length=100)
+    subjectid = models.CharField(max_length=100)
+    testname = models.CharField(max_length=100)
+    duration = models.IntegerField(max_length=1)
+    status = models.CharField(max_length=12)
+    expiredate = models.DateField(default=datetime.date.today())
+    
+    def __str__(self):
+        return self.subjectid
+
+class Question(models.Model):
+    id = models.UUIDField(primary_key=True, default= uuid.uuid4, editable=False, max_length=200)
+    testid = models.CharField(max_length=100)
+    question = models.CharField(max_length=400)
+    questiontype = models.CharField(max_length=12)
+    option1 = models.CharField(max_length=400, blank = True)
+    option2 = models.CharField(max_length=400, blank = True)
+    option3 = models.CharField(max_length=400, blank = True)
+    option4 = models.CharField(max_length=400, blank = True)
+    marks = models.CharField(max_length=400)
+    answer = models.CharField(max_length=400, blank = True)
+    
+    def __str__(self):
+        return self.testid
+
+class Submission(models.Model):
+    id = models.UUIDField(primary_key=True, default= uuid.uuid4, editable=False, max_length=200)
+    questionid = models.CharField(max_length=100)
+    submission = models.CharField(max_length=1000)
+    userid = models.CharField(max_length=200)
+    
+    def __str__(self):
+        return self.questionid
+
+class Result(models.Model):
+    id = models.UUIDField(primary_key=True, default= uuid.uuid4, editable=False, max_length=200)
+    testid = models.CharField(max_length=100)
+    score = models.IntegerField(max_length=200, default=0)
+    userid = models.CharField(max_length=200)
+    
+    def __str__(self):
+        return self.testid
+
 
 
 

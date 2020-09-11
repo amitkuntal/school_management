@@ -100,7 +100,23 @@ class EmployeeAttendanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = EmployeeAttendance
         fields = '__all__'
-        
+
+class TestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Test
+        fields = '__all__'
+
+class QuestionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Question
+        fields = '__all__'
+
+class ResultSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Result
+        fields = '__all__'
+
+
 class ErrorMessageSerializer(serializers.Serializer):
     code = serializers.CharField(max_length=80)
     message =  serializers.CharField(max_length=80)

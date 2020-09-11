@@ -24,5 +24,6 @@ urlpatterns = [
     path('fee/',include('fee.urls')),
     path('education/',include('education_portal.urls')),
     path('student/',include('student_app.urls')),
-    path('employee/',include('employee.urls'))
+    path('employee/',include('employee.urls')),
+    path('testapp/',include('test_app.urls'))
 ]
