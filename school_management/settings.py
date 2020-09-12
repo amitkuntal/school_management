@@ -102,11 +102,11 @@ DATABASES = {
     # }
     'default':{
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'altuser',
-        'PASSWORD': 'altpass123',
-        'HOST': 'atlantisdb.cf63wit2to0f.ap-south-1.rds.amazonaws.com',
-        'PORT': '5432' 
+        'NAME': 'atlantis',
+        'USER': 'atlantis',
+        'PASSWORD': 'atlantis',
+        'HOST': 'postgresql-12686-0.cloudclusters.net',
+        'PORT': '12686' 
     }
     # 'default':{
     #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
