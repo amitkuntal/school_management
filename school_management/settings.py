@@ -92,6 +92,14 @@ DATABASES = {
     #     'HOST': 'ec2-52-202-66-191.compute-1.amazonaws.com',
     #     'PORT': '' 
     # }
+    # 'default':{
+    #     'ENGINE': 'django.db.backends.postgresql',
+    #     'NAME': 'postgres',
+    #     'USER': 'altuser',
+    #     'PASSWORD': 'altpass123',
+    #     'HOST': 'atlantisdb.cf63wit2to0f.ap-south-1.rds.amazonaws.com',
+    #     'PORT': '5432' 
+    # }
     'default':{
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'postgres',
