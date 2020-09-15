@@ -798,7 +798,7 @@ class UploadExcel(APIView):
                     link = link.split("v=")[1]
                     link = link.split("&")[0]
                     link = "https://www.youtube.com/embed/"+link
-                    tutorial = EducationPortal(subjectid = request.data["subjectid"], chaptername=row[0].value, videolink=link)
+                    tutorial = EducationPortal(subjectid = row[2].value, chaptername=row[0].value, videolink=link)
                     tutorial.save()
                 return Response(dict(code="200", message="pass"), status = status.HTTP_200_OK)
             return Response(dict(code="400", message="Unauthrized Access"), status= status.HTTP_401_UNAUTHORIZED)
