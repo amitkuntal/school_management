@@ -193,7 +193,6 @@ class TimeTable(models.Model):
 class Test(models.Model):
     id = models.UUIDField(primary_key=True, default= uuid.uuid4, editable=False, max_length=200)
     classid = models.CharField(max_length=100)
-    subjectid = models.CharField(max_length=100)
     testname = models.CharField(max_length=100)
     duration = models.IntegerField(max_length=1)
     status = models.CharField(max_length=12)
@@ -207,12 +206,12 @@ class Question(models.Model):
     testid = models.CharField(max_length=100)
     question = models.CharField(max_length=400)
     questiontype = models.CharField(max_length=12)
-    option1 = models.CharField(max_length=400, blank = True)
-    option2 = models.CharField(max_length=400, blank = True)
-    option3 = models.CharField(max_length=400, blank = True)
-    option4 = models.CharField(max_length=400, blank = True)
+    option1 = models.CharField(max_length=400, blank = True, null=True)
+    option2 = models.CharField(max_length=400, blank = True, null=True)
+    option3 = models.CharField(max_length=400, blank = True, null=True)
+    option4 = models.CharField(max_length=400, blank = True, null=True)
     marks = models.CharField(max_length=400)
-    answer = models.CharField(max_length=400, blank = True)
+    answer = models.CharField(max_length=400, blank = True, null=True)
     
     def __str__(self):
         return self.testid
