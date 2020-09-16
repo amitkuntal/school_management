@@ -22,16 +22,20 @@ class TestView(APIView):
             authToken = request.headers["auth"]
             payload  = jwt.decode(authToken,"secret")
             role = payload['role']
-            school = Login.objects.filter(role='Admin').all()
-            student = Login.objects.filter(role= 'Student').all()
-            employee = Login.objects.filter(role__in = ['Teacher','Accountant','Reception'])
-            return Response(dict(school=len(school), student = len(student), employee = len(employee)),status=status.HTTP_200_OK)
+            if(role == 'Student'):
+                user = Login.objects.get(email__exact = payload['email'])
+                student = Student.objects.get(userid__exact = user.id)
+                submittedTets = SubmittedTestIdSerializer(SubmittedTest.objects.filter(userid__exact = student.userid), many=True)
+                submittedTets = submittedTets.data
+                tests = TestSerializer(Test.objects.filter(classid__exact = student.classid, status__exact = "Published").exclude(id__in=submittedTets), many = True)
+                return Response(tests.data,status=status.HTTP_200_OK)
+            return Response(dict(code="400", message="Unauthorized access"), status=status.HTTP_401_UNAUTHORIZED)
         except jwt.exceptions.ExpiredSignatureError:
             return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
         except jwt.exceptions.DecodeError:
                 return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
-        except:
-            return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
+        # except:
+        #     return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
 
     def delete(self, request):
         return Response(status=status.HTTP_404_NOT_FOUND)
@@ -128,6 +132,32 @@ class GetStudentScore(APIView):
             userinfo = Login.objects.get(email__exact = payload['email'])
             result = ResultSerializer(Result.objects.get(userid__exact = userinfo.id, testid__exact = request.data["testid"]))
             return Response(result.data, status= status.HTTP_200_OK)
+        except jwt.exceptions.ExpiredSignatureError:
+            return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.DecodeError:
+                return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
+
+    def put(self, request):
+        return Response(status = status.HTTP_404_NOT_FOUND)
+
+    def get(self, request):
+        return Response(status = status.HTTP_404_NOT_FOUND)
+
+    def delete(self, request):
+        return Response(status = status.HTTP_404_NOT_FOUND)
+
+class SubmitTest(APIView):
+    def post(self, request):
+        try:
+            authToken = request.headers["auth"]
+            payload  = jwt.decode(authToken,"secret")
+            if(payload["role"] == 'Student'):
+                userinfo = Login.objects.get(email__exact = payload['email'])
+                
+                return Response(result.data, status= status.HTTP_200_OK)
+            return Response(dict(code="400", message="Unauthorized"), status= status.HTTP_401_UNAUTHORIZED)
         except jwt.exceptions.ExpiredSignatureError:
             return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
         except jwt.exceptions.DecodeError:

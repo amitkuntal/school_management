@@ -116,6 +116,17 @@ class ResultSerializer(serializers.ModelSerializer):
         model = Result
         fields = '__all__'
 
+class SubmittedTestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SubmittedTest
+        fields = '__all__'
+
+class SubmittedTestIdSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SubmittedTest
+        fields = ['testid']
+
+
 
 class ErrorMessageSerializer(serializers.Serializer):
     code = serializers.CharField(max_length=80)

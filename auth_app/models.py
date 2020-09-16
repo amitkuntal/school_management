@@ -219,6 +219,7 @@ class Question(models.Model):
 class Submission(models.Model):
     id = models.UUIDField(primary_key=True, default= uuid.uuid4, editable=False, max_length=200)
     questionid = models.CharField(max_length=100)
+    testid = models.CharField(max_length=100)
     submission = models.CharField(max_length=1000)
     userid = models.CharField(max_length=200)
     
@@ -226,6 +227,15 @@ class Submission(models.Model):
         return self.questionid
 
 class Result(models.Model):
+    id = models.UUIDField(primary_key=True, default= uuid.uuid4, editable=False, max_length=200)
+    testid = models.CharField(max_length=100)
+    score = models.IntegerField(max_length=200, default=0)
+    userid = models.CharField(max_length=200)
+    
+    def __str__(self):
+        return self.testid
+
+class SubmittedTest(models.Model):
     id = models.UUIDField(primary_key=True, default= uuid.uuid4, editable=False, max_length=200)
     testid = models.CharField(max_length=100)
     score = models.IntegerField(max_length=200, default=0)
