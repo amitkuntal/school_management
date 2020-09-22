@@ -682,8 +682,8 @@ class GetEmployeeProfile(APIView):
             return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
         except jwt.exceptions.DecodeError:
                 return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
-        # except:
-        #     return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
         
     def post(self, request):
         try:
@@ -707,8 +707,8 @@ class GetEmployeeProfile(APIView):
             return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
         except jwt.exceptions.DecodeError:
                 return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
-        except:
-            return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
+        # except:
+        #     return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
 
 
 

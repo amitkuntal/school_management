@@ -7,5 +7,7 @@ urlpatterns = [
     path('subject',SubjectView.as_view()),
     path('homework', HomeWorkView.as_view()),
     path('question', SubmitQuestion.as_view()),
-    path('score', GetStudentScore.as_view())
+    path('score', GetStudentScore.as_view()),
+    path('test/submit', SubmitTest.as_view()),
+    path('get/test/scores',GetTestsWithResult.as_view())
     ]

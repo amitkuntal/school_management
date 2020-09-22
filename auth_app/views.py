@@ -35,7 +35,7 @@ class LoginView(APIView):
                         image = user.image
                         data = base64.b64encode(image)
                         return Response(dict(accessToken=accessToken, name=user.name, role = user.role, image = data), status= status.HTTP_201_CREATED)
-                    return Response(dict(code="Failed", message = "Your Account is locked"))
+                    return Response(dict(code="Failed", message = "Your Account is locked"), status=status.HTTP_402_PAYMENT_REQUIRED)
                 return Response( dict(code="Failed", message ="Invalid User Name or Password"), status = status.HTTP_401_UNAUTHORIZED)
             except Login.DoesNotExist:
                 return Response( dict(code="Failed", message ="You don't have any account"), status = status.HTTP_401_UNAUTHORIZED)

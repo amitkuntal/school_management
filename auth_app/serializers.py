@@ -61,6 +61,12 @@ class UserSerializer(serializers.ModelSerializer):
         model = Login
         fields = ['name', 'email', 'role' , 'image','active','id']
 
+
+class UserInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Login
+        fields = ['name', 'email','id']
+
 class EmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
@@ -116,14 +122,9 @@ class ResultSerializer(serializers.ModelSerializer):
         model = Result
         fields = '__all__'
 
-class SubmittedTestSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = SubmittedTest
-        fields = '__all__'
-
 class SubmittedTestIdSerializer(serializers.ModelSerializer):
     class Meta:
-        model = SubmittedTest
+        model = Result
         fields = ['testid']
 
 
