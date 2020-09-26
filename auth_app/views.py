@@ -185,13 +185,13 @@ class ProfileView(APIView):
             #If User role is Employe then Employee profile will return
             elif (role in ['Accountant', 'Teacher','Reception']):
                 employee = Employee.objects.get_or_create(userid = userid)[0]
-                additionalInfo = dict(fathername = employee.fathername,mothername=employee.mothername,dob = employee.dob,mobile=employee.mobile,address1 =employee.address1 ,address2 = employee.address2,address3 = employee.address3,city = employee.city,state = employee.state,zip =employee.zip)
+                additionalInfo = dict(fathername = employee.fathername,mothername=employee.mothername,dob = employee.dob,mobile=employee.mobile,address1 =employee.address1 ,address2 = employee.address2,address3 = employee.address3,city = employee.city,state = employee.state,zip =employee.zip, classid = employee.classid)
                 response = dict(personalInfo=dict(name = user.name,email=user.email, image=data),additionalInfo=additionalInfo)
                 return Response(response,status= status.HTTP_201_CREATED)
             #If user role is student then student profile will return
             elif (role == 'Student'):
                 student = Student.objects.get_or_create(userid = userid)[0]
-                additionalInfo = dict(fathername = student.fathername,mothername=student.mothername,dob = student.dob,mobileno1=student.mobileno1,mobileno2=student.mobileno2,address1 =student.address1 ,address2 = student.address2,address3 = student.address3,city = student.city,state = student.state,zip =student.zip)
+                additionalInfo = dict(fathername = student.fathername,mothername=student.mothername,dob = student.dob,mobileno1=student.mobileno1,mobileno2=student.mobileno2,address1 =student.address1 ,address2 = student.address2,address3 = student.address3,city = student.city,state = student.state,zip =student.zip, classid = student.promotedclassid)
                 response = dict(personalInfo=dict(name = user.name,email=user.email, image=data),additionalInfo=additionalInfo)
                 return Response(response,status= status.HTTP_201_CREATED)
         #Exception Handling

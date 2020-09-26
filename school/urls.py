@@ -15,5 +15,6 @@ urlpatterns = [
     path('get/student/profile', GetStudentProfile.as_view()),
     path('get/employee/profile', GetEmployeeProfile.as_view()),
     path('profile', SchoolProfile.as_view()),
-    path('upload/file',UploadExcel.as_view())
+    path('upload/file',UploadExcel.as_view()),
+    path('live/class',LiveClassView.as_view())
     ]

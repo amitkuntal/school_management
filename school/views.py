@@ -813,3 +813,53 @@ class UploadExcel(APIView):
     def delete(self, request):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
+
+class LiveClassView(APIView):
+    def put(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    def get(self, request):
+        try:
+            authToken = request.headers["auth"]
+            payload  = jwt.decode(authToken,"secret")
+            role = payload['role']
+            if(role  == 'Student'):
+                userinfo = Login.objects.get(email__exact = payload['email'])
+                personalInfo = Student.objects.get(userid__exact = userinfo.id)
+                classid = personalInfo.promotedclassid.replace('-','')
+                liveClass =LiveClassSerializer(LiveClass.objects.get(roomid__exact= classid))
+                liveClass = liveClass.data
+                return Response(dict(email=userinfo.email, roomid = liveClass["roomid"], link = liveClass["link"]), status = status.HTTP_200_OK)
+            return Response(dict(code="400", message="Unauthrized Access"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.ExpiredSignatureError:
+            return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.DecodeError:
+                return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
+        # except:
+        #     return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
+
+
+    def post(self, request):
+        try:
+            authToken = request.headers["auth"]
+            payload  = jwt.decode(authToken,"secret")
+            role = payload['role']
+            if(role  in ['Reception', 'Teacher', 'Accountant']):
+                liveClass = LiveClass.objects.get_or_create(roomid= request.data["roomid"])[0]
+                liveClass.roomid = request.data["roomid"]
+                liveClass.link = request.data["link"]
+                liveClass.save()
+                return Response(dict(code="200", message="pass"), status = status.HTTP_200_OK)
+            return Response(dict(code="400", message="Unauthrized Access"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.ExpiredSignatureError:
+            return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.DecodeError:
+                return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
+
+
+
+    def delete(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+

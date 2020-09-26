@@ -127,6 +127,10 @@ class SubmittedTestIdSerializer(serializers.ModelSerializer):
         model = Result
         fields = ['testid']
 
+class LiveClassSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LiveClass
+        fields = '__all__'
 
 
 class ErrorMessageSerializer(serializers.Serializer):

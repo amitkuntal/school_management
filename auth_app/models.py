@@ -237,6 +237,14 @@ class Result(models.Model):
     def __str__(self):
         return self.testid
 
+class LiveClass(models.Model):
+    id = models.UUIDField(primary_key=True, default= uuid.uuid4, editable=False, max_length=200)
+    roomid = models.CharField(max_length=100, default= uuid.uuid4)
+    link = models.CharField(max_length=200)
+    
+    def __str__(self):
+        return self.roomid
+
 class ErrorMessage():
     code = models.CharField(max_length=80)
     message =  models.CharField(max_length=80)
