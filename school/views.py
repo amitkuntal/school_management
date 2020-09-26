@@ -632,6 +632,7 @@ class GetStudentProfile(APIView):
                 userinfo = userinfo.data
                 studentinfo = studentinfo.data
                 studentclass =  Class.objects.get(id__exact = studentinfo["promotedclassid"])
+                schoolid = studentinfo["schoolid"]
                 studentinfo["currentclass"] = studentclass.classname
                 schoolid = studentinfo["schoolid"]
                 classinfo =  ClassSerializer(Class.objects.filter(schoolid__exact = schoolid).all(), many=True)
