@@ -239,7 +239,7 @@ class Result(models.Model):
 
 class LiveClass(models.Model):
     id = models.UUIDField(primary_key=True, default= uuid.uuid4, editable=False, max_length=200)
-    roomid = models.CharField(max_length=100, default= uuid.uuid4)
+    roomid = models.CharField(max_length=100)
     link = models.CharField(max_length=200)
     
     def __str__(self):

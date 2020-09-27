@@ -26,7 +26,7 @@ class TestView(APIView):
             if(role == 'Student'):
                 user = Login.objects.get(email__exact = payload['email'])
                 student = Student.objects.get(userid__exact = user.id)
-                test1 = Test.objects.filter(classid__exact = student.classid, status__exact = "Published").exclude(id__in=Result.objects.filter(userid__exact = student.userid, status__exact ="Submitted").values_list('testid', flat=True))
+                test1 = Test.objects.filter(classid__exact = student.promotedclassid, status__exact = "Published").exclude(id__in=Result.objects.filter(userid__exact = student.userid, status__exact ="Submitted").values_list('testid', flat=True))
                 tests = TestSerializer(test1, many = True)
                 return Response(tests.data, status=status.HTTP_200_OK)
             return Response(dict(code="400", message="Unauthorized access"), status=status.HTTP_401_UNAUTHORIZED)
@@ -34,8 +34,8 @@ class TestView(APIView):
             return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
         except jwt.exceptions.DecodeError:
                 return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
-        # except:
-        #     return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
 
     def delete(self, request):
         return Response(status=status.HTTP_404_NOT_FOUND)
@@ -173,7 +173,7 @@ class SubmitTest(APIView):
                 result.status = "Submitted"
                 result.score = marks
                 result.save()
-                return Response(dict(code="200", message="You test is submitted. Yor score is "+str(result.score)), status= status.HTTP_200_OK)
+                return Response(dict(code="200", message="Your test is submitted. Your score is "+str(result.score)), status= status.HTTP_200_OK)
             return Response(dict(code="400", message="Unauthorized"), status= status.HTTP_401_UNAUTHORIZED)
         except jwt.exceptions.ExpiredSignatureError:
             return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
