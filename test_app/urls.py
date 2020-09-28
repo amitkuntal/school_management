@@ -9,5 +9,6 @@ urlpatterns = [
     path('tests/question/update', QuestionUpdate.as_view()),
     path('tests/get/question/count',QuestionCount.as_view()),
     path('all/student/submission', AllStudentSubmission.as_view()),
-    path('student/submission', StudentSubmissions.as_view())
+    path('student/submission', StudentSubmissions.as_view()),
+    path('delete/tests', DeleteTests.as_view())
     ]

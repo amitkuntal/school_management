@@ -337,3 +337,54 @@ class StudentSubmissions(APIView):
 
     def delete(self, request):
         return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+
+class DeleteTests(APIView):
+    def get(self, request):
+        try:
+            authToken = request.headers["auth"]
+            payload  = jwt.decode(authToken,"secret")
+            role = payload['role']
+            if(role in ["School", "Teacher"]):
+                tests = TestSerializer(Test.objects.all(), many=True)
+                tests = tests.data
+                for test in tests:
+                    Test.objects.filter(id = test["id"]).delete()
+                    Question.objects.filter(testid = test["id"]).delete()
+                    Submission.objects.filter(testid = test["id"]).delete
+                    Result.objects.filter(testid = test["id"]).delete
+                return Response(dict(code="200", message="Success"), status = status.HTTP_200_OK)
+            return Response(dict(code="400", message="Unauthorize access"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.ExpiredSignatureError:
+            return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.DecodeError:
+                return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
+
+
+    def put(self, request):
+        return Response(status= status.HTTP_404_NOT_FOUND)
+        
+    def post(self, request):
+        try:
+            authToken = request.headers["auth"]
+            payload  = jwt.decode(authToken,"secret")
+            role = payload['role']
+            if(role in ["School", "Teacher"]):
+                Test.objects.filter(id = request.data['id']).delete()
+                Question.objects.filter(testid = request.data['id']).delete()
+                Submission.objects.filter(testid = request.data['id']).delete()
+                Result.objects.filter(testid = request.data['id']).delete()
+                return Response(status = status.HTTP_200_OK)
+            return Response(dict(code="400", message="Unauthorize access"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.ExpiredSignatureError:
+            return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
+        except jwt.exceptions.DecodeError:
+                return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(dict(code="400", message="Something went wrong"), status= status.HTTP_401_UNAUTHORIZED)
+
+    def delete(self, request):
+        return Response(status=status.HTTP_404_NOT_FOUND)
