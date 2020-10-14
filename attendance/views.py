@@ -154,8 +154,8 @@ class EmployeeAttendanceView(APIView):
             return Response(dict(code="400", message="Expired Signature"), status= status.HTTP_401_UNAUTHORIZED)
         except jwt.exceptions.DecodeError:
                 return Response(dict(code="400", message="Invalid Token"), status= status.HTTP_401_UNAUTHORIZED)
-        # except:
-        #     return Response(dict(code="400", message="Missing Token"), status= status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response(dict(code="400", message="Something went wrong Token"), status= status.HTTP_401_UNAUTHORIZED)
     def get(self, request):
         try:
             authToken = request.headers["auth"]
