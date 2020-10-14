@@ -146,7 +146,6 @@ class EmployeeAttendanceView(APIView):
                 users =  Login.objects.filter(id__in = employeeids).all()
                 data = UserSerializer(users, many = True).data
                 for user in data:
-                    user['image'] = readFiles(user['image'])
                     employeeattendance = EmployeeAttendanceSerializer(EmployeeAttendance.objects.filter(userid__exact = user["id"],attendancedate__range=[request.data["fromDate"], request.data["toDate"]]).order_by('attendancedate').all(),many=True)
                     user["attendancedata"] = employeeattendance.data
                 return Response(data, status= status.HTTP_200_OK)
